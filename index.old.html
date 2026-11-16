@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+  <head>
+    <base target="_top">
+    <?!= include('CSS'); ?>
+  </head>
+<html>
+  <body>
+    <!--<img src="https://lh3.googleusercontent.com/d/1iFXqA1HnpE5QdfZa6E58P_ST9aV5RLjK?thdmc=s100?authuser=0" alt="Tiger" class="center" style="width: 30%; margin-bottom: 20px;" />-->
+    <div id="output">
+      <? var Concurso = "Putxera" ?>
+      <? var Gastos = 0 ?>
+      <? var Ingresos = 0 ?>
+      <? var Boletos = 0 ?>
+      <? var BoletoFin = 0 ?>
+      <? var Primero = 1 ?>
+      <? var Segundo = 2 ?>
+      <? var Tercero = 3 ?>
+      <? var Local = 0 ?>
+      <? ControlWeb.forEach(Control => { ?>
+        <? if(Control.Estado == "INSCRIPCIÓN") { ?>    
+          <section class="PutxerasPoblacion">
+            <? Transparencia.forEach(Asiento => { ?>
+              <? if(Asiento.Tipo == "Gasto") { ?>
+                <? Gastos = Gastos + Asiento.Euros ?>
+              <? }else{ ?>
+                <? Ingresos = Ingresos + Asiento.Euros ?>
+                <? if(Asiento.Concepto != "Inscripciones") { ?>
+                  <? Boletos = Boletos + Asiento.Euros ?>
+                <? }; ?>
+              <? }; ?>
+            <? }); ?>
+            <? if(Ingresos - Gastos >= 0) { ?> 
+              <? var numero = Ingresos - Gastos;
+              var numeroFormateado = numero.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."); ?>  
+              <h1 class="mensaje ingreso">Gracias por hacer viable este concurso, recaudado para la próxima edición: ¡<?= numeroFormateado ?> euros!</h1>
+            <? }else{ ?>
+              <? var numero = (Ingresos - Gastos) * (-1);
+              var numeroFormateado = numero.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."); ?>
+              <h1 class="mensaje gasto">Participa en nuestro sorteo y además de poder ganar una putxera, colaboras a hacer viable este concurso. ¡Solo faltan <?= numeroFormateado ?> euros!</h1>
+            <? }; ?>                     
+            <br /><br />           
+            <p class="textcenter myletter"><strong>
+              Ahora puedes consultar:
+              <br />Las Putxeras Inscritas por población.
+              <br />Las Putxeras Inscritas.
+              <br />Las cuentas del Concurso.
+            </strong></p>
+            <br /><br />             
+            <div class="tbl-header">
+              <table cellpadding="0" cellspacing="0" border="0">
+                <thead>
+                  <tr>
+                    <? PutxerasInscritas.forEach(PutxerasInscrita => { ?>
+                      <th width="100%" class="textcenter"><strong><?=Concurso ?>s Inscritas: <?=PutxerasInscrita.Putxeras ?></strong></th>
+                    <? }); ?>
+                  </tr>
+                </thead>
+              </table>
+              <table cellpadding="0" cellspacing="0" border="0">
+                <thead>
+                  <tr>
+                    <th width= "20%" class="textcenter"><strong><?=Concurso ?>s</strong></th>
+                    <th width= "80%" class="textleft"><strong>Población</strong></th>                  
+                  </tr>
+                </thead>
+              </table>        
+            </div>
+            <div class="tbl-content">
+              <table cellpadding="0" cellspacing="0" border="0">
+                <tbody>
+                  <? PutxerasPoblaciones.forEach(PutxerasPoblacion => { ?>
+                    <tr>
+                      <td width= "20%" class="textcenter"><?=PutxerasPoblacion.Putxeras ?></td>
+                      <td width= "80%" class="textleft"><?=PutxerasPoblacion.Poblacion ?></td>
+                    </tr>
+                  <? }); ?>
+                </tbody>
+              </table>
+            </div>
+            <br /><br />
+            <div class="tbl-header">
+              <table cellpadding="0" cellspacing="0" border="0">
+                <thead>
+                  <tr>
+                    <th width= "20%" class="textcenter"><strong><?=Concurso ?></strong></th>
+                    <th width= "40%" class="textleft"><strong>Nombre</strong></th>
+                    <th width= "40%" class="textleft"><strong>Población</strong></th>                 
+                  </tr>
+                </thead>
+              </table>        
+            </div>
+            <div class="tbl-content">
+              <table cellpadding="0" cellspacing="0" border="0">
+                <tbody>
+                  <? Putxeras.forEach(Putxera => { ?>
+                    <tr>
+                      <td width= "20%" class="textcenter"><?=Putxera.Putxera ?></td>
+                      <td width= "40%" class="textleft"><?=Putxera.Nombre ?></td>
+                      <td width= "40%" class="textleft">
+                        <? if(Putxera.Barrio != "") { ?>
+                           <?=Putxera.Barrio ?> (<?=Putxera.Poblacion ?>)
+                        <? } else {; ?>
+                          <?=Putxera.Poblacion ?>
+                        <? }; ?>
+                        <? if(Putxera.Provincia != "Bizkaia") { ?>
+                           (<?=Putxera.Provincia ?>)
+                        <? }; ?>
+                      </td>
+                    </tr>
+                  <? }); ?>
+                </tbody>
+              </table>
+            </div>
+            <br /><br />
+            <div class="tbl-header">
+              <table cellpadding="0" cellspacing="0" border="0">
+                <thead>
+                  <tr>
+                    <th colspan="3" class="textcenter">
+                      <strong>El "txokito" de la tranparencia:<br />Las cuentas del Concurso.</strong>
+                    </th>               
+                  </tr>
+                  <tr>
+                    <th width= "50%" class="textcenter"><strong>Concepto</strong></th>
+                    <th width= "20%" class="textcenter"><strong>Euros</strong></th> 
+                    <th width= "30%">&nbsp;</th>                
+                  </tr>
+                </thead>
+              </table>        
+            </div>            
+            <div class="tbl-content">
+              <table cellpadding="0" cellspacing="0" border="0">
+                <tbody>
+                  <? Transparencia.forEach(Asiento => { ?>
+                    <tr>
+                        <? if(Asiento.Tipo == "Gasto") { ?>
+                          <td width= "50%" class="textcenter gastos"><?=Asiento.Concepto ?></td>
+                          <td width= "20%" class="textright gastos"> -<?=Asiento.Euros ?>
+                        <? }else{ ?>
+                          <? if(Asiento.Concepto == "Inscripciones") { ?>
+                            <td width= "50%" class="textcenter ingresos"><?=Asiento.Concepto ?></td>
+                            <td width= "20%" class="textright ingresos"> +<?=Asiento.Euros ?>
+                          <? }else if (BoletoFin == 0) { ?>
+                            <td width= "50%" class="textcenter ingresos">Boletos</td>
+                            <td width= "20%" class="textright ingresos"> +<?=Boletos ?><? BoletoFin = 1 ?>
+                          <? }; ?>
+                        <? }; ?>
+                      </td>
+                      <td width= "30%">&nbsp;</td>  
+                    </tr>
+                  <? }); ?>
+                </tbody>
+              </table>
+            </div>
+            <br /><br />              
+          </section> 
+        <? } else if(Control.Estado == "VOTACIÓN") { ?>
+          <section class="PutxerasPoblacion">
+            <p class="textcenter myletter"><strong>
+              Ahora puedes consultar
+              <br />ORDENADAS POR NÚMERO DE <?=Concurso ?> HASTA QUE TERMINE LA VOTACIÓN:
+              <br />El Premio Local Basauri puestos 1 al 5.
+              <br />La Clasificación puestos 1 al 10.
+              <br />La Clasificación puestos del 10 en adelante.
+            </strong></p>
+            <br /><br />         
+            <div class="tbl-header">
+              <table cellpadding="0" cellspacing="0" border="0">
+                <thead>
+                  <tr>
+                      <th width="100%" class="textcenter"><strong>Premio Local Basauri puestos 1 al 5<br />ORDENADOS POR NÚMERO DE <?=Concurso ?> HASTA QUE TERMINE LA VOTACIÓN</strong></th>
+                  </tr>
+                </thead>
+              </table>
+              <table cellpadding="0" cellspacing="0" border="0">
+                <thead>
+                  <tr>
+                    <th width= "20%" class="textcenter"><strong><?=Concurso ?></strong></th>
+                    <th width= "40%" class="textleft"><strong>Nombre</strong></th> 
+                    <th width= "40%" class="textleft"><strong>Población</strong></th>                  
+                  </tr>
+                </thead>
+              </table>        
+            </div>
+            <div class="tbl-contentbasauri">
+              <table cellpadding="0" cellspacing="0" border="0">
+                <tbody>
+                  <? VotacionB5es.forEach(VotacionB5 => { ?>
+                    <tr>
+                      <td width= "20%" class="textcenter"><?=VotacionB5.Putxera ?></td>
+                      <td width= "40%" class="textleft"><?=VotacionB5.Nombre ?></td>
+                      <td width= "40%" class="textleft"><?=VotacionB5.Poblacion ?></td>
+                    </tr>
+                  <? }); ?>
+                </tbody>
+              </table>
+            </div>
+            <br /><br />                
+            <div class="tbl-header">
+              <table cellpadding="0" cellspacing="0" border="0">
+                <thead>
+                  <tr>
+                      <th width="100%" class="textcenter"><strong>General puestos 1 al 10<br />ORDENADOS POR NÚMERO DE <?=Concurso ?> HASTA QUE TERMINE LA VOTACIÓN</strong></th>
+                  </tr>
+                </thead>
+              </table>
+              <table cellpadding="0" cellspacing="0" border="0">
+                <thead>
+                  <tr>
+                    <th width= "20%" class="textcenter"><strong><?=Concurso ?></strong></th>
+                    <th width= "40%" class="textleft"><strong>Nombre</strong></th> 
+                    <th width= "40%" class="textleft"><strong>Población</strong></th>                  
+                  </tr>
+                </thead>
+              </table>        
+            </div>
+            <div class="tbl-content">
+              <table cellpadding="0" cellspacing="0" border="0">
+                <tbody>
+                  <? VotacionG10es.forEach(VotacionG10 => { ?>
+                    <tr>
+                      <td width= "20%" class="textcenter"><?=VotacionG10.Putxera ?></td>
+                      <td width= "40%" class="textleft"><?=VotacionG10.Nombre ?></td>
+                      <td width= "40%" class="textleft"><?=VotacionG10.Poblacion ?></td>
+                    </tr>
+                  <? }); ?>
+                </tbody>
+              </table>
+            </div>  
+            <br /><br /> 
+            <div class="tbl-header">
+              <table cellpadding="0" cellspacing="0" border="0">
+                <thead>
+                  <tr>
+                      <th width="100%" class="textcenter"><strong>General puestos +10<br />ORDENADOS POR NÚMERO DE <?=Concurso ?> HASTA QUE TERMINE LA VOTACIÓN</strong></th>
+                  </tr>
+                </thead>
+              </table>
+              <table cellpadding="0" cellspacing="0" border="0">
+                <thead>
+                  <tr>
+                    <th width= "20%" class="textcenter"><strong><?=Concurso ?></strong></th>
+                    <th width= "40%" class="textleft"><strong>Nombre</strong></th> 
+                    <th width= "40%" class="textleft"><strong>Población</strong></th>                  
+                  </tr>
+                </thead>
+              </table>        
+            </div> 
+            <div class="tbl-content">
+              <table cellpadding="0" cellspacing="0" border="0">
+                <tbody>
+                  <? VotacionG11es.forEach(VotacionG11 => { ?>
+                    <tr>
+                      <td width= "20%" class="textcenter"><?=VotacionG11.Putxera ?></td>
+                      <td width= "40%" class="textleft"><?=VotacionG11.Nombre ?></td>
+                      <td width= "40%" class="textleft"><?=VotacionG11.Poblacion ?></td>
+                    </tr>
+                  <? }); ?>
+                </tbody>
+              </table>
+            </div>
+            <br /><br />               
+          </section> 
+        <? } else if(Control.Estado == "CLASIFICACIÓN") { ?>
+          <? var Puesto = 0 ?>
+          <section class="PutxerasPoblacion">
+            <p class="textcenter myletter"><strong>
+              Ahora puedes consultar:
+              <br />El Podio de la Clasificación General.
+              <br />El Premio Local a la mejor Putxera de Basauri.
+              <br />La Clasificación General.
+            </strong></p>
+            <br /><br /><br />
+            <? Clasificaciones.forEach(Clasificacion => { ?>
+              <? if(Clasificacion.General == 1 && Clasificacion.Basauri == "BASAURI"){ ?>
+                <? Primero = Primero + 1 ?>
+                <? Segundo = Segundo + 1 ?>
+                <? Tercero = Tercero + 1 ?>
+              <? } else if(Clasificacion.General == 2 && Clasificacion.Basauri == "BASAURI") { ?> 
+                <? Segundo = Segundo + 1 ?>
+                <? Tercero = Tercero + 1 ?>  
+              <? } else if(Clasificacion.General == 3 && Clasificacion.Basauri == "BASAURI") { ?> 
+                <? Tercero = Tercero + 1 ?>                             
+              <? }; ?>
+            <? }); ?>
+            <? if(Control.Podio == "SI"){ ?> 
+              <div class="podio">
+                <? Clasificaciones.forEach(Clasificacion => { ?>
+                  <? if(Clasificacion.General == Segundo){ ?>                  
+                    <div class="escalon segundo">                    
+                      <div class="nombre-ganador">
+                        <div class="nombre">
+                          <strong><?=Concurso ?> Nº <?=Clasificacion.Putxera ?><br/>(Puntos: <?=Clasificacion.Total ?>)</strong>
+                          <br/><?=Clasificacion.Nombre ?> (<?=Clasificacion.Poblacion ?>)
+                          <span class="subnombre">
+                            <br />&emsp;Sabor: <?=Clasificacion.Sabor ?>
+                            <br />&emsp;Punto: <?=Clasificacion.Punto ?>
+                            <br />&emsp;Presencia: <?=Clasificacion.Presencia ?>
+                          </span>
+                        </div>
+                      </div>
+                      <div class="numero-escalon"><strong>2</strong></div>
+                    </div>
+                  <? }; ?>
+                <? }); ?>
+                <? Clasificaciones.forEach(Clasificacion => { ?>
+                  <? if(Clasificacion.General == Primero){ ?>
+                    <div class="escalon primero">
+                      <div class="nombre-ganador">
+                        <div class="nombre">
+                          <strong><?=Concurso ?> Nº <?=Clasificacion.Putxera ?><br/>(Puntos: <?=Clasificacion.Total ?>)</strong>
+                          <br/><?=Clasificacion.Nombre ?> (<?=Clasificacion.Poblacion ?>)
+                          <span class="subnombre">
+                            <br />&emsp;Sabor: <?=Clasificacion.Sabor ?>
+                            <br />&emsp;Punto: <?=Clasificacion.Punto ?>
+                            <br />&emsp;Presencia: <?=Clasificacion.Presencia ?>
+                          </span>
+                        </div>
+                      </div>
+                      <div class="numero-escalon"><strong>1</strong></div>
+                    </div>
+                  <? }; ?>
+                <? }); ?>
+                <? Clasificaciones.forEach(Clasificacion => { ?>
+                  <? if(Clasificacion.General == Tercero){ ?> 
+                    <div class="escalon tercero">
+                      <div class="nombre-ganador">
+                        <div class="nombre">
+                          <strong><?=Concurso ?> Nº <?=Clasificacion.Putxera ?><br/>(Puntos: <?=Clasificacion.Total ?>)</strong>
+                          <br/><?=Clasificacion.Nombre ?> (<?=Clasificacion.Poblacion ?>)
+                          <span class="subnombre">
+                            <br />&emsp;Sabor: <?=Clasificacion.Sabor ?>
+                            <br />&emsp;Punto: <?=Clasificacion.Punto ?>
+                            <br />&emsp;Presencia: <?=Clasificacion.Presencia ?>
+                          </span>
+                        </div>
+                      </div>
+                      <div class="numero-escalon"><strong>3</strong></div>
+                    </div>
+                  <? }; ?>
+                <? }); ?>              
+              </div>
+            <? }; ?>     
+            <? Basauris.forEach(Basauri => { ?>
+              <? if(Basauri.Basauri == 1) { ?> 
+                <table cellpadding="0" cellspacing="0" border="0">
+                  <thead>
+                    <tr>
+                      <th class="textcenter diplomalateral">&nbsp;</th>
+                      <th class="myletter textcenter diploma">
+                        <br /><br />Premio Local Basauri
+                        <br /><?=Concurso ?> Nº <?=Basauri.Putxera ?>
+                        <br /><?=Basauri.Nombre ?> (Puntos: <?=Basauri.Total ?>)
+                        <br />Sabor: <?=Basauri.Sabor ?>
+                        <br />Punto: <?=Basauri.Punto ?>
+                        <br />Presencia: <?=Basauri.Presencia ?><br /><br /><br />
+                      </th>
+                      <th class="textcenter diplomalateral">&nbsp;</th>
+                    </tr>
+                  </thead>
+                </table>                                     
+              <? } ?>
+            <? }); ?>
+            <br /><br />           
+            <div class="tbl-header">
+              <table cellpadding="0" cellspacing="0" border="0">
+                <thead>
+                  <tr>
+                      <th width="100%" class="textcenter"><strong>Clasificación General</strong></th>
+                  </tr>
+                </thead>
+              </table>       
+            </div>
+            <div class="tbl-content">
+              <table cellpadding="0" cellspacing="0" border="0">
+                <tbody>
+                  <? Clasificaciones.forEach(Clasificacion => { ?>
+                    <? if(Clasificacion.General != Puesto){  
+                      Puesto = Puesto + 1 ?>
+                      <? if(Puesto == 1) { ?>
+                        <tr>
+                          <th width="100%" class="textleft puesto"><strong>1º Puesto y Primer Premio   <?=Clasificacion.Total ?> Puntos</strong></th>                  
+                        </tr>
+                      <? } else if(Puesto == 2) { ?>
+                        <tr>
+                          <? if(Clasificacion.Basauri == "BASAURI") { ?> 
+                            <? Local = 1 ?>
+                            <th width="100%" class="textleft puesto"><strong>2º Puesto y Premio Local    <?=Clasificacion.Total ?> Puntos</strong></th> 
+                          <? } else {; ?>
+                            <th width="100%" class="textleft puesto"><strong>2º Puesto y Segundo Premio  <?=Clasificacion.Total ?> Puntos</strong></th> 
+                          <? }; ?>             
+                        </tr>
+                      <? } else if(Puesto == 3) { ?>
+                        <tr>  
+                          <? if(Clasificacion.Basauri == "BASAURI") { ?> 
+                            <? Local = 1 ?>
+                            <th width="100%" class="textleft puesto"><strong>3º Puesto y Premio Local    <?=Clasificacion.Total ?> Puntos</strong></th> 
+                          <? } else {; ?>
+                            <? if(Local == 1) { ?> 
+                              <th width="100%" class="textleft puesto"><strong>3º Puesto y Segundo Premio  <?=Clasificacion.Total ?> Puntos</strong></th>  
+                            <? } else {; ?>
+                              <th width="100%" class="textleft puesto"><strong>3º Puesto y Tercer Premio   <?=Clasificacion.Total ?> Puntos</strong></th>
+                            <? }; ?> 
+                          <? }; ?>                                 
+                        </tr>
+                      <? } else if(Puesto == 4) { ?>
+                        <tr>  
+                          <? if(Local == 1) { ?> 
+                            <th width="100%" class="textleft puesto"><strong>4º Puesto y Tercer Premio   <?=Clasificacion.Total ?> Puntos</strong></th> 
+                          <? } else {; ?>
+                            <th width="100%" class="textleft puesto"><strong>4º Puesto       <?=Clasificacion.Total ?> Puntos</strong></th>
+                          <? }; ?>                                 
+                        </tr>
+                      <? } else if(Puesto > 4 && Clasificacion.Putxera > 0) { ?>
+                        <tr>
+                          <th width="100%" class="textleft puesto"><strong><?=Clasificacion.General ?>º Puesto      <?=Clasificacion.Total ?> Puntos</strong></th>                        
+                        </tr>
+                      <? }; ?>
+                    <? }; ?>
+                    <? if(Clasificacion.Putxera > 0) { ?>
+                      <tr>
+                        <? if(Clasificacion.Basauri == "BASAURI") { ?> 
+                          <th width="100%" class="textleft ingreso"><strong><?=Concurso ?> Nº <?=Clasificacion.Putxera ?> <?=Clasificacion.Nombre ?> (<?=Clasificacion.Poblacion ?>) PREMIO LOCAL
+                            <br />Sabor: <?=Clasificacion.Sabor ?> Punto: <?=Clasificacion.Punto ?> Presencia: <?=Clasificacion.Presencia ?></strong></th>
+                        <? } else {; ?>
+                          <td width="100%" class="textleft"><strong><?=Concurso ?> Nº <?=Clasificacion.Putxera ?></strong> <?=Clasificacion.Nombre ?> (<?=Clasificacion.Poblacion ?>)
+                            <br />Sabor: <?=Clasificacion.Sabor ?> Punto: <?=Clasificacion.Punto ?> Presencia: <?=Clasificacion.Presencia ?></td>
+                        <? }; ?>
+                      </tr>
+                    <? }; ?>
+                  <? }); ?>
+                </tbody>
+              </table>
+            </div>
+            <br /><br />      
+          </section>             
+        <? } else {; ?>
+          <h1>ERROR</h1>
+        <? }; ?>
+      <? }); ?>           
+    </div>
+    <?!= include('JS'); ?>
+  </body>
+</html>

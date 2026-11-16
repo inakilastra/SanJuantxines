@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Concurso de Putxeras · San Juantxines Basauri</title>
+  
+  <!-- Google Fonts: Plus Jakarta Sans & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Outfit"', 'sans-serif'],
+          },
+          colors: {
+            amber: {
+              50: '#fffbeb',
+              100: '#fef3c7',
+              200: '#fde68a',
+              300: '#fcd34d',
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
+              700: '#b45309',
+              800: '#92400e',
+              900: '#78350f',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #FBF9F5;
+      color: #1C1917;
+    }
+
+    /* Brillos y gradientes elegantes para el podio */
+    .podio-oro {
+      background: linear-gradient(135deg, #FDE68A 0%, #F59E0B 50%, #D97706 100%);
+      box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.4);
+    }
+    .podio-plata {
+      background: linear-gradient(135deg, #F1F5F9 0%, #CBD5E1 50%, #94A3B8 100%);
+      box-shadow: 0 10px 25px -5px rgba(148, 163, 184, 0.4);
+    }
+    .podio-bronce {
+      background: linear-gradient(135deg, #FED7AA 0%, #FB923C 50%, #C2410C 100%);
+      box-shadow: 0 10px 25px -5px rgba(234, 88, 12, 0.35);
+    }
+
+    /* Scrollbar sutil y moderno */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F3F4F6;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+
+    /* Pulso animado para el indicador en vivo */
+    @keyframes pulse-live {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.92); }
+    }
+    .live-dot {
+      animation: pulse-live 2s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans antialiased text-stone-800 selection:bg-amber-500 selection:text-white">
+
+  <!-- ================= TOPBAR & CABECERA ================= -->
+  <header class="sticky top-0 z-40 bg-stone-900/95 backdrop-blur-md border-b border-stone-800 text-white transition-all">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3">
+      
+      <!-- Identidad y Título -->
+      <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 to-amber-400 flex items-center justify-center shadow-lg shadow-amber-500/20 text-stone-900 font-display font-extrabold text-xl">
+            🍲
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs uppercase tracking-widest font-bold text-amber-400">San Juantxines · Basauri</span>
+              <span id="badge-live" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 live-dot"></span>
+                EN DIRECTO
+              </span>
+            </div>
+            <h1 class="text-lg sm:text-xl font-display font-bold text-white tracking-tight">Concurso de Putxeras</h1>
+          </div>
+        </div>
+
+        <!-- Botón de ajustes de conexión (móvil) -->
+        <button onclick="toggleConfigModal()" class="sm:hidden p-2 rounded-lg text-stone-400 hover:text-white hover:bg-stone-800" title="Configurar origen de datos">
+          <i data-lucide="settings" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Estado actual y controles de actualización -->
+      <div class="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto text-xs">
+        
+        <!-- Estado actual del concurso (Badge) -->
+        <div class="flex items-center gap-2">
+          <span class="text-stone-400 hidden md:inline">Fase:</span>
+          <span id="fase-badge" class="px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider text-xs bg-amber-500/20 text-amber-300 border border-amber-500/40">
+            Cargando...
+          </span>
+        </div>
+
+        <div class="h-4 w-px bg-stone-700 hidden sm:block"></div>
+
+        <!-- Botón refrescar y última sincronización -->
+        <div class="flex items-center gap-2">
+          <span id="sync-time" class="text-stone-400 hidden lg:inline">Sincronizando...</span>
+          <button id="btn-refresh" onclick="cargarDatos(true)" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 active:scale-95 text-stone-200 hover:text-white font-medium border border-stone-700 transition">
+            <i data-lucide="refresh-cw" id="refresh-icon" class="w-3.5 h-3.5"></i>
+            <span>Actualizar</span>
+          </button>
+          
+          <!-- Botón de ajustes de conexión (desktop) -->
+          <button onclick="toggleConfigModal()" class="hidden sm:flex p-2 rounded-lg text-stone-400 hover:text-white hover:bg-stone-800 transition" title="Configurar conexión con Google Sheets">
+            <i data-lucide="settings" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ================= SUB-NAVEGACIÓN (TABS) ================= -->
+  <nav class="bg-white border-b border-stone-200 sticky top-[69px] sm:top-[65px] z-30 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="flex items-center space-x-2 sm:space-x-8 overflow-x-auto py-2.5 no-scrollbar text-sm font-semibold text-stone-500">
+        <button onclick="cambiarVista('principal')" id="tab-principal" class="tab-btn active text-amber-700 border-b-2 border-amber-600 pb-1.5 px-2 flex items-center gap-2 whitespace-nowrap">
+          <i data-lucide="trophy" class="w-4 h-4"></i>
+          <span id="tab-principal-title">Concurso</span>
+        </button>
+        <button onclick="cambiarVista('transparencia')" id="tab-transparencia" class="tab-btn hover:text-stone-800 pb-1.5 px-2 flex items-center gap-2 whitespace-nowrap">
+          <i data-lucide="coins" class="w-4 h-4"></i>
+          <span>El Txokito de la Transparencia</span>
+        </button>
+        <button onclick="cambiarVista('poblaciones')" id="tab-poblaciones" class="tab-btn hover:text-stone-800 pb-1.5 px-2 flex items-center gap-2 whitespace-nowrap">
+          <i data-lucide="map-pin" class="w-4 h-4"></i>
+          <span>Participación por Pueblos</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ================= CUERPO PRINCIPAL ================= -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-8">
+
+    <!-- Loading skeleton / Indicador de carga inicial -->
+    <div id="loading-state" class="text-center py-20 space-y-4">
+      <div class="inline-block p-4 rounded-2xl bg-amber-100 text-amber-700 animate-bounce">
+        <i data-lucide="loader-2" class="w-8 h-8 animate-spin"></i>
+      </div>
+      <p class="text-stone-600 font-medium">Obteniendo datos en directo desde Google Sheets...</p>
+    </div>
+
+    <!-- Error state -->
+    <div id="error-state" class="hidden bg-red-50 border border-red-200 rounded-2xl p-6 text-center max-w-lg mx-auto">
+      <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3">
+        <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+      </div>
+      <h3 class="text-base font-bold text-red-900 mb-1">No se pudieron cargar los datos en vivo</h3>
+      <p id="error-msg" class="text-sm text-red-700 mb-4">Verifica la URL del Google Apps Script o la conexión.</p>
+      <div class="flex items-center justify-center gap-3">
+        <button onclick="cargarDatos(true)" class="px-4 py-2 bg-red-600 text-white rounded-xl text-xs font-semibold hover:bg-red-700 transition">
+          Reintentar
+        </button>
+        <button onclick="usarDatosDemo()" class="px-4 py-2 bg-white text-stone-700 border border-stone-300 rounded-xl text-xs font-semibold hover:bg-stone-50 transition">
+          Ver con datos de prueba
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= CONTENEDOR VISTA PRINCIPAL ================= -->
+    <div id="vista-principal" class="hidden space-y-8">
+
+      <!-- ================= 1. FASE INSCRIPCIÓN ================= -->
+      <section id="seccion-inscripcion" class="hidden space-y-8">
+        
+        <!-- Banner de viabilidad económica / transparencia -->
+        <div id="banner-recaudacion" class="rounded-3xl p-6 sm:p-8 transition-all border shadow-sm">
+          <!-- Renderizado dinámicamente -->
+        </div>
+
+        <!-- Métricas destacadas -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="bg-white p-6 rounded-2xl border border-stone-200/80 shadow-sm flex items-center justify-between">
+            <div>
+              <p class="text-xs uppercase font-bold text-stone-500 tracking-wider">Total Putxeras</p>
+              <h3 id="stat-total-putxeras" class="text-3xl font-display font-extrabold text-stone-900 mt-1">0</h3>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+              <i data-lucide="utensils" class="w-6 h-6"></i>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-2xl border border-stone-200/80 shadow-sm flex items-center justify-between">
+            <div>
+              <p class="text-xs uppercase font-bold text-stone-500 tracking-wider">Poblaciones</p>
+              <h3 id="stat-total-pueblos" class="text-3xl font-display font-extrabold text-stone-900 mt-1">0</h3>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+              <i data-lucide="map-pin" class="w-6 h-6"></i>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-2xl border border-stone-200/80 shadow-sm flex items-center justify-between sm:col-span-2 lg:col-span-1">
+            <div>
+              <p class="text-xs uppercase font-bold text-stone-500 tracking-wider">Premio Local</p>
+              <h3 id="stat-total-basauri" class="text-3xl font-display font-extrabold text-stone-900 mt-1">Basauri</h3>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <i data-lucide="award" class="w-6 h-6"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Buscador y lista de Putxeras Inscritas -->
+        <div class="bg-white rounded-3xl border border-stone-200/80 shadow-sm overflow-hidden">
+          <div class="p-6 border-b border-stone-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-xl font-display font-bold text-stone-900">Putxeras Inscritas</h2>
+              <p class="text-xs text-stone-500 mt-0.5">Listado de participantes registrados para la presente edición</p>
+            </div>
+            
+            <!-- Buscador -->
+            <div class="relative w-full md:w-72">
+              <i data-lucide="search" class="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+              <input type="text" id="search-inscripcion" oninput="filtrarInscritos()" placeholder="Buscar por nº, nombre o pueblo..." 
+                     class="w-full pl-9 pr-4 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition">
+            </div>
+          </div>
+
+          <!-- Tabla de inscritos -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-stone-50/70 text-stone-600 font-bold uppercase text-[11px] tracking-wider border-b border-stone-100">
+                <tr>
+                  <th class="py-3.5 px-6 w-24 text-center">Nº</th>
+                  <th class="py-3.5 px-6">Cocinero / Cuadrilla</th>
+                  <th class="py-3.5 px-6">Localidad</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-inscripcion" class="divide-y divide-stone-100 font-medium">
+                <!-- Generado dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+
+          <div id="sin-resultados-inscripcion" class="hidden py-12 text-center text-stone-400 text-sm">
+            No se encontraron participantes que coincidan con la búsqueda.
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ================= 2. FASE VOTACIÓN ================= -->
+      <section id="seccion-votacion" class="hidden space-y-8">
+        
+        <!-- Banner explicativo de cata a ciegas -->
+        <div class="bg-gradient-to-r from-amber-900 to-stone-900 text-white rounded-3xl p-6 sm:p-8 shadow-md relative overflow-hidden">
+          <div class="relative z-10 max-w-2xl">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 mb-3">
+              <i data-lucide="eye-off" class="w-3.5 h-3.5"></i>
+              CATA Y PUNTUACIÓN A CIEGAS
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-display font-bold tracking-tight mb-2">Votación en Curso</h2>
+            <p class="text-stone-300 text-sm leading-relaxed">
+              Las putxeras se muestran <strong>ordenadas por número de putxera</strong> para preservar la confidencialidad de las valoraciones hasta la lectura del veredicto final.
+            </p>
+          </div>
+        </div>
+
+        <!-- Grupos de votación -->
+        <div class="space-y-6">
+
+          <!-- Premio Local Basauri 1 al 5 -->
+          <div class="bg-white rounded-3xl border border-stone-200/80 shadow-sm overflow-hidden">
+            <div class="p-5 sm:p-6 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border-b border-stone-100 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-700 flex items-center justify-center font-bold">
+                  🏆
+                </div>
+                <div>
+                  <h3 class="font-display font-bold text-stone-900 text-lg">Premio Local Basauri · Puestos 1 al 5</h3>
+                  <p class="text-xs text-stone-500">Ordenados por número de putxera</p>
+                </div>
+              </div>
+              <span id="badge-count-b5" class="px-2.5 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-bold">0</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm">
+                <thead class="bg-stone-50/70 text-stone-600 font-bold uppercase text-[11px] tracking-wider border-b border-stone-100">
+                  <tr>
+                    <th class="py-3 px-6 w-24 text-center">Nº</th>
+                    <th class="py-3 px-6">Nombre</th>
+                    <th class="py-3 px-6">Población</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-votacion-b5" class="divide-y divide-stone-100"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- General 1 al 10 -->
+          <div class="bg-white rounded-3xl border border-stone-200/80 shadow-sm overflow-hidden">
+            <div class="p-5 sm:p-6 bg-stone-50 border-b border-stone-100 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-stone-200 text-stone-700 flex items-center justify-center font-bold">
+                  ⭐
+                </div>
+                <div>
+                  <h3 class="font-display font-bold text-stone-900 text-lg">Clasificación General · Puestos 1 al 10</h3>
+                  <p class="text-xs text-stone-500">Ordenados por número de putxera</p>
+                </div>
+              </div>
+              <span id="badge-count-g10" class="px-2.5 py-1 bg-stone-200 text-stone-800 rounded-full text-xs font-bold">0</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm">
+                <thead class="bg-stone-50/70 text-stone-600 font-bold uppercase text-[11px] tracking-wider border-b border-stone-100">
+                  <tr>
+                    <th class="py-3 px-6 w-24 text-center">Nº</th>
+                    <th class="py-3 px-6">Nombre</th>
+                    <th class="py-3 px-6">Población</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-votacion-g10" class="divide-y divide-stone-100"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- General +10 -->
+          <div class="bg-white rounded-3xl border border-stone-200/80 shadow-sm overflow-hidden">
+            <div class="p-5 sm:p-6 bg-stone-50 border-b border-stone-100 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-stone-200 text-stone-700 flex items-center justify-center font-bold">
+                  📋
+                </div>
+                <div>
+                  <h3 class="font-display font-bold text-stone-900 text-lg">Clasificación General · Puestos +10</h3>
+                  <p class="text-xs text-stone-500">Ordenados por número de putxera</p>
+                </div>
+              </div>
+              <span id="badge-count-g11" class="px-2.5 py-1 bg-stone-200 text-stone-800 rounded-full text-xs font-bold">0</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm">
+                <thead class="bg-stone-50/70 text-stone-600 font-bold uppercase text-[11px] tracking-wider border-b border-stone-100">
+                  <tr>
+                    <th class="py-3 px-6 w-24 text-center">Nº</th>
+                    <th class="py-3 px-6">Nombre</th>
+                    <th class="py-3 px-6">Población</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-votacion-g11" class="divide-y divide-stone-100"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ================= 3. FASE CLASIFICACIÓN FINAL ================= -->
+      <section id="seccion-clasificacion" class="hidden space-y-10">
+
+        <!-- PODIO DE GANADORES -->
+        <div id="bloque-podio" class="space-y-4">
+          <div class="text-center max-w-md mx-auto">
+            <span class="text-xs uppercase font-extrabold tracking-widest text-amber-600 bg-amber-100/70 px-3 py-1 rounded-full">
+              Cuadro de Honor
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-display font-extrabold text-stone-900 mt-2">Podio de Ganadores</h2>
+            <p class="text-xs text-stone-500 mt-1">Los tres mejores clasificados del Concurso de Putxeras</p>
+          </div>
+
+          <!-- Escenario Podio 3D Moderno -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 pt-6 items-end">
+            
+            <!-- 2º PUESTO (Izquierda en desktop) -->
+            <div id="podio-segundo" class="order-2 md:order-1 bg-white rounded-3xl p-6 border border-stone-200 shadow-sm relative overflow-hidden flex flex-col items-center text-center">
+              <div class="w-14 h-14 rounded-2xl podio-plata text-stone-900 flex items-center justify-center font-display font-black text-2xl mb-4 shadow-md">
+                2
+              </div>
+              <span class="text-[11px] uppercase tracking-wider font-extrabold text-slate-500 mb-1">Segundo Premio</span>
+              <h3 id="p2-nombre" class="text-lg font-display font-bold text-stone-900 leading-snug">Cargando...</h3>
+              <p id="p2-pueblo" class="text-xs text-stone-500 mt-0.5">---</p>
+              
+              <div class="mt-4 pt-4 border-t border-stone-100 w-full">
+                <div class="text-xs font-bold text-stone-400 uppercase tracking-wider mb-2">Putxera Nº <span id="p2-num" class="text-stone-900 font-black">--</span></div>
+                <div class="text-2xl font-display font-extrabold text-stone-900 mb-3"><span id="p2-puntos">0</span> <span class="text-xs font-bold text-stone-500">pts</span></div>
+                
+                <div class="grid grid-cols-3 gap-1 bg-stone-50 p-2 rounded-xl text-center text-[11px]">
+                  <div><span class="text-stone-400 block text-[9px] uppercase font-bold">Sabor</span><span id="p2-sabor" class="font-bold text-stone-700">0</span></div>
+                  <div><span class="text-stone-400 block text-[9px] uppercase font-bold">Punto</span><span id="p2-punto" class="font-bold text-stone-700">0</span></div>
+                  <div><span class="text-stone-400 block text-[9px] uppercase font-bold">Pres.</span><span id="p2-presencia" class="font-bold text-stone-700">0</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 1º PUESTO (Centro y más destacado) -->
+            <div id="podio-primero" class="order-1 md:order-2 bg-gradient-to-b from-amber-500/10 via-white to-white rounded-3xl p-6 sm:p-8 border-2 border-amber-400 shadow-xl shadow-amber-500/10 relative overflow-hidden flex flex-col items-center text-center -translate-y-2">
+              <div class="absolute top-0 right-0 bg-amber-500 text-stone-900 px-3 py-1 rounded-bl-xl font-display font-extrabold text-[10px] uppercase tracking-widest">
+                Campeón
+              </div>
+              <div class="w-16 h-16 rounded-2xl podio-oro text-stone-900 flex items-center justify-center font-display font-black text-3xl mb-4 shadow-lg">
+                1
+              </div>
+              <span class="text-xs uppercase tracking-wider font-extrabold text-amber-700 mb-1">Primer Premio</span>
+              <h3 id="p1-nombre" class="text-xl font-display font-extrabold text-stone-900 leading-snug">Cargando...</h3>
+              <p id="p1-pueblo" class="text-sm font-medium text-amber-800/80 mt-0.5">---</p>
+              
+              <div class="mt-4 pt-4 border-t border-amber-200/50 w-full">
+                <div class="text-xs font-bold text-amber-700 uppercase tracking-wider mb-2">Putxera Nº <span id="p1-num" class="text-stone-900 font-black">--</span></div>
+                <div class="text-3xl font-display font-black text-amber-700 mb-3"><span id="p1-puntos">0</span> <span class="text-sm font-bold text-stone-500">pts</span></div>
+                
+                <div class="grid grid-cols-3 gap-1 bg-amber-50/80 p-2.5 rounded-xl text-center text-xs border border-amber-200/40">
+                  <div><span class="text-amber-800/60 block text-[10px] uppercase font-bold">Sabor</span><span id="p1-sabor" class="font-bold text-stone-800">0</span></div>
+                  <div><span class="text-amber-800/60 block text-[10px] uppercase font-bold">Punto</span><span id="p1-punto" class="font-bold text-stone-800">0</span></div>
+                  <div><span class="text-amber-800/60 block text-[10px] uppercase font-bold">Pres.</span><span id="p1-presencia" class="font-bold text-stone-800">0</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3º PUESTO (Derecha en desktop) -->
+            <div id="podio-tercero" class="order-3 bg-white rounded-3xl p-6 border border-stone-200 shadow-sm relative overflow-hidden flex flex-col items-center text-center">
+              <div class="w-14 h-14 rounded-2xl podio-bronce text-white flex items-center justify-center font-display font-black text-2xl mb-4 shadow-md">
+                3
+              </div>
+              <span class="text-[11px] uppercase tracking-wider font-extrabold text-orange-700 mb-1">Tercer Premio</span>
+              <h3 id="p3-nombre" class="text-lg font-display font-bold text-stone-900 leading-snug">Cargando...</h3>
+              <p id="p3-pueblo" class="text-xs text-stone-500 mt-0.5">---</p>
+              
+              <div class="mt-4 pt-4 border-t border-stone-100 w-full">
+                <div class="text-xs font-bold text-stone-400 uppercase tracking-wider mb-2">Putxera Nº <span id="p3-num" class="text-stone-900 font-black">--</span></div>
+                <div class="text-2xl font-display font-extrabold text-stone-900 mb-3"><span id="p3-puntos">0</span> <span class="text-xs font-bold text-stone-500">pts</span></div>
+                
+                <div class="grid grid-cols-3 gap-1 bg-stone-50 p-2 rounded-xl text-center text-[11px]">
+                  <div><span class="text-stone-400 block text-[9px] uppercase font-bold">Sabor</span><span id="p3-sabor" class="font-bold text-stone-700">0</span></div>
+                  <div><span class="text-stone-400 block text-[9px] uppercase font-bold">Punto</span><span id="p3-punto" class="font-bold text-stone-700">0</span></div>
+                  <div><span class="text-stone-400 block text-[9px] uppercase font-bold">Pres.</span><span id="p3-presencia" class="font-bold text-stone-700">0</span></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- DIPLOMA DE HONOR: PREMIO LOCAL BASAURI -->
+        <div id="bloque-local-basauri" class="bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-amber-600/20 relative overflow-hidden">
+          <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+            
+            <div class="flex items-center gap-4 sm:gap-6 text-center md:text-left">
+              <div class="w-20 h-20 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-4xl shrink-0 shadow-inner">
+                🏅
+              </div>
+              <div>
+                <span class="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-[11px] font-extrabold tracking-widest uppercase mb-1">
+                  Mención Especial
+                </span>
+                <h3 class="text-2xl sm:text-3xl font-display font-extrabold tracking-tight">Premio Local Basauri</h3>
+                <p id="local-nombre" class="text-lg font-semibold text-amber-100 mt-1">Cargando ganador local...</p>
+                <p id="local-num" class="text-xs text-amber-200 mt-0.5">Putxera Nº --</p>
+              </div>
+            </div>
+
+            <div class="bg-stone-900/40 backdrop-blur-md border border-white/15 rounded-2xl p-4 sm:p-5 flex items-center gap-6 shrink-0 w-full md:w-auto justify-around">
+              <div class="text-center">
+                <span class="text-xs font-bold text-amber-200 uppercase tracking-wider block">Total</span>
+                <span id="local-total" class="text-3xl font-display font-black">0</span>
+                <span class="text-[10px] text-amber-200 block">puntos</span>
+              </div>
+              <div class="h-10 w-px bg-white/20"></div>
+              <div class="grid grid-cols-3 gap-3 text-center text-xs">
+                <div><span class="text-amber-200/80 block text-[10px] uppercase font-bold">Sabor</span><span id="local-sabor" class="font-bold text-base">0</span></div>
+                <div><span class="text-amber-200/80 block text-[10px] uppercase font-bold">Punto</span><span id="local-punto" class="font-bold text-base">0</span></div>
+                <div><span class="text-amber-200/80 block text-[10px] uppercase font-bold">Pres.</span><span id="local-presencia" class="font-bold text-base">0</span></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- TABLA COMPLETA DE CLASIFICACIÓN GENERAL -->
+        <div class="bg-white rounded-3xl border border-stone-200/80 shadow-sm overflow-hidden">
+          <div class="p-6 border-b border-stone-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h3 class="text-xl font-display font-bold text-stone-900">Clasificación General Completa</h3>
+              <p class="text-xs text-stone-500 mt-0.5">Resultados finales auditados y desglosados por notas</p>
+            </div>
+            
+            <div class="relative w-full md:w-72">
+              <i data-lucide="search" class="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+              <input type="text" id="search-clasificacion" oninput="filtrarClasificacion()" placeholder="Buscar por cocinero, nº o puesto..." 
+                     class="w-full pl-9 pr-4 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition">
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-stone-50/70 text-stone-600 font-bold uppercase text-[11px] tracking-wider border-b border-stone-100">
+                <tr>
+                  <th class="py-3.5 px-6 w-20 text-center">Puesto</th>
+                  <th class="py-3.5 px-4 w-20 text-center">Nº</th>
+                  <th class="py-3.5 px-6">Participante / Cuadrilla</th>
+                  <th class="py-3.5 px-4">Localidad</th>
+                  <th class="py-3.5 px-3 text-center hidden sm:table-cell">Sabor</th>
+                  <th class="py-3.5 px-3 text-center hidden sm:table-cell">Punto</th>
+                  <th class="py-3.5 px-3 text-center hidden sm:table-cell">Presencia</th>
+                  <th class="py-3.5 px-6 text-right font-black">Total Pts</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-clasificacion" class="divide-y divide-stone-100 font-medium">
+                <!-- Generado dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+
+          <div id="sin-resultados-clasificacion" class="hidden py-12 text-center text-stone-400 text-sm">
+            No se encontraron participantes con ese criterio de búsqueda.
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+
+    <!-- ================= CONTENEDOR VISTA: TRANSPARENCIA ================= -->
+    <div id="vista-transparencia" class="hidden space-y-6">
+      <div class="bg-white rounded-3xl border border-stone-200/80 shadow-sm p-6 sm:p-8">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h2 class="text-xl sm:text-2xl font-display font-bold text-stone-900">El "Txokito" de la Transparencia</h2>
+            <p class="text-xs sm:text-sm text-stone-500">Cuentas claras y balance económico del Concurso de Putxeras</p>
+          </div>
+        </div>
+
+        <div id="transparencia-balance-card" class="mb-8 p-6 rounded-2xl border"></div>
+
+        <div class="overflow-x-auto rounded-2xl border border-stone-100">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-stone-50 text-stone-600 font-bold uppercase text-[11px] tracking-wider">
+              <tr>
+                <th class="py-3.5 px-6">Concepto</th>
+                <th class="py-3.5 px-6 text-center w-36">Tipo</th>
+                <th class="py-3.5 px-6 text-right w-40">Importe</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-transparencia" class="divide-y divide-stone-100 font-medium"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= CONTENEDOR VISTA: POBLACIONES ================= -->
+    <div id="vista-poblaciones" class="hidden space-y-6">
+      <div class="bg-white rounded-3xl border border-stone-200/80 shadow-sm p-6 sm:p-8">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
+            <i data-lucide="map" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h2 class="text-xl sm:text-2xl font-display font-bold text-stone-900">Participación por Población</h2>
+            <p class="text-xs sm:text-sm text-stone-500">Distribución de las cuadrillas y putxeras según su procedencia</p>
+          </div>
+        </div>
+
+        <div id="grid-poblaciones" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="bg-stone-900 text-stone-400 text-xs py-8 border-t border-stone-800 mt-12">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="font-display font-bold text-white text-sm">🍲 San Juantxines</span>
+        <span class="text-stone-500">·</span>
+        <span>Concurso de Putxeras de Basauri</span>
+      </div>
+      <div class="flex items-center gap-4 text-stone-400">
+        <span id="footer-update-text">Conexión con Google Sheets activa</span>
+        <button onclick="toggleConfigModal()" class="text-amber-400 hover:text-amber-300 underline font-medium">Configurar enlace</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= MODAL CONFIGURACIÓN DE CONEXIÓN ================= -->
+  <div id="config-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-stone-100 space-y-5 animate-scale-up">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
+            <i data-lucide="link-2" class="w-5 h-5"></i>
+          </div>
+          <h3 class="text-lg font-display font-bold text-stone-900">Conexión en Vivo con Google Sheets</h3>
+        </div>
+        <button onclick="toggleConfigModal()" class="text-stone-400 hover:text-stone-600 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <p class="text-xs text-stone-600 leading-relaxed">
+        Pega a continuación la URL de la aplicación web de tu <strong>Google Apps Script</strong> desplegada con acceso anónimo, para que GitHub Pages lea las hojas en vivo.
+      </p>
+
+      <div class="space-y-2">
+        <label class="text-xs font-bold uppercase tracking-wider text-stone-700">URL del Google Apps Script Web App</label>
+        <input type="url" id="input-apps-script-url" placeholder="https://script.google.com/macros/s/AKfy.../exec"
+               class="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none font-mono">
+      </div>
+
+      <div class="space-y-2 pt-2">
+        <span class="text-xs font-bold uppercase tracking-wider text-stone-700 block">Probar vistas (Simulación):</span>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="probarFase('INSCRIPCIÓN')" class="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-lg text-xs font-semibold">
+            Simular Inscripción
+          </button>
+          <button onclick="probarFase('VOTACIÓN')" class="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-lg text-xs font-semibold">
+            Simular Votación
+          </button>
+          <button onclick="probarFase('CLASIFICACIÓN')" class="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-lg text-xs font-semibold">
+            Simular Clasificación
+          </button>
+        </div>
+      </div>
+
+      <div class="pt-4 flex items-center justify-end gap-3 border-t border-stone-100">
+        <button onclick="toggleConfigModal()" class="px-4 py-2 rounded-xl text-stone-600 hover:bg-stone-100 text-xs font-semibold">
+          Cancelar
+        </button>
+        <button onclick="guardarConfiguracion()" class="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-md shadow-amber-600/20">
+          Guardar y Conectar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= LÓGICA JAVASCRIPT ================= -->
+  <script>
+    // URL del Google Apps Script en vivo
+    const URL_APPS_SCRIPT_DEFAULT = "https://script.google.com/macros/s/AKfycbxA1s66_Nqf_daXuxbXwxQ1mOkUsXLFNVa9qrqL4N32mM-i_KRvJAaHF-wc56k0GkIMdQ/exec";
+    let appsScriptUrl = localStorage.getItem("SANJUANTXINES_API_URL") || URL_APPS_SCRIPT_DEFAULT;
+    let appData = null;
+    let autoRefreshInterval = null;
+
+    // Datos demo para pruebas inmediatas si aún no se ha desplegado el Apps Script
+    const DEMO_DATA = {
+      ControlWeb: [{ Estado: "CLASIFICACIÓN", Podio: "SI" }],
+      PutxerasInscritas: [{ Putxeras: 34 }],
+      PutxerasPoblaciones: [
+        { Poblacion: "Basauri", Putxeras: 18 },
+        { Poblacion: "Galdakao", Putxeras: 6 },
+        { Poblacion: "Bilbao", Putxeras: 4 },
+        { Poblacion: "Arrigorriaga", Putxeras: 3 },
+        { Poblacion: "Balmaseda", Putxeras: 2 },
+        { Poblacion: "Etxebarri", Putxeras: 1 }
+      ],
+      Putxeras: [
+        { Putxera: 1, Nombre: "Cuadrilla El Pote", Provincia: "Bizkaia", Poblacion: "Basauri", Barrio: "Ariz" },
+        { Putxera: 2, Nombre: "Txoko Zuri", Provincia: "Bizkaia", Poblacion: "Basauri", Barrio: "Pozokoetxe" },
+        { Putxera: 3, Nombre: "Sukaldaris de Galdakao", Provincia: "Bizkaia", Poblacion: "Galdakao", Barrio: "" },
+        { Putxera: 4, Nombre: "Los Amigos del Carbón", Provincia: "Bizkaia", Poblacion: "Arrigorriaga", Barrio: "" },
+        { Putxera: 5, Nombre: "Peña San Juan", Provincia: "Bizkaia", Poblacion: "Basauri", Barrio: "Kareaga" },
+        { Putxera: 6, Nombre: "Balmasedako Babarrunak", Provincia: "Bizkaia", Poblacion: "Balmaseda", Barrio: "" }
+      ],
+      VotacionB5es: [
+        { Putxera: 1, Nombre: "Cuadrilla El Pote", Poblacion: "Basauri" },
+        { Putxera: 2, Nombre: "Txoko Zuri", Poblacion: "Basauri" },
+        { Putxera: 5, Nombre: "Peña San Juan", Poblacion: "Basauri" }
+      ],
+      VotacionG10es: [
+        { Putxera: 1, Nombre: "Cuadrilla El Pote", Poblacion: "Basauri" },
+        { Putxera: 3, Nombre: "Sukaldaris de Galdakao", Poblacion: "Galdakao" },
+        { Putxera: 6, Nombre: "Balmasedako Babarrunak", Poblacion: "Balmaseda" }
+      ],
+      VotacionG11es: [
+        { Putxera: 4, Nombre: "Los Amigos del Carbón", Poblacion: "Arrigorriaga" }
+      ],
+      Clasificaciones: [
+        { Putxera: 6, Nombre: "Balmasedako Babarrunak", Poblacion: "Balmaseda", Total: 88, Sabor: 44, Punto: 28, Presencia: 16, Basauri: "", General: 1 },
+        { Putxera: 1, Nombre: "Cuadrilla El Pote", Poblacion: "Basauri", Total: 85, Sabor: 42, Punto: 27, Presencia: 16, Basauri: "BASAURI", General: 2 },
+        { Putxera: 3, Nombre: "Sukaldaris de Galdakao", Poblacion: "Galdakao", Total: 82, Sabor: 40, Punto: 26, Presencia: 16, Basauri: "", General: 3 },
+        { Putxera: 2, Nombre: "Txoko Zuri", Poblacion: "Basauri", Total: 79, Sabor: 38, Punto: 26, Presencia: 15, Basauri: "BASAURI", General: 4 },
+        { Putxera: 5, Nombre: "Peña San Juan", Poblacion: "Basauri", Total: 74, Sabor: 36, Punto: 24, Presencia: 14, Basauri: "BASAURI", General: 5 }
+      ],
+      Basauris: [
+        { Putxera: 1, Nombre: "Cuadrilla El Pote", Poblacion: "Basauri", Total: 85, Sabor: 42, Punto: 27, Presencia: 16, Basauri: 1 }
+      ],
+      Transparencia: [
+        { Concepto: "Inscripciones", Tipo: "Ingreso", Euros: 340 },
+        { Concepto: "Venta de Boletos Sorteo", Tipo: "Ingreso", Euros: 420 },
+        { Concepto: "Compra de Putxera Sorteo", Tipo: "Gasto", Euros: 260 },
+        { Concepto: "Carbón y Organización", Tipo: "Gasto", Euros: 150 },
+        { Concepto: "Trofeos y Premios", Tipo: "Gasto", Euros: 200 }
+      ]
+    };
+
+    window.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+      document.getElementById("input-apps-script-url").value = appsScriptUrl;
+
+      if (!appsScriptUrl) {
+        usarDatosDemo();
+      } else {
+        cargarDatos();
+      }
+
+      autoRefreshInterval = setInterval(() => {
+        if (appsScriptUrl) cargarDatos(false);
+      }, 45000);
+    });
+
+    async function cargarDatos(esManual = false) {
+      if (!appsScriptUrl) {
+        usarDatosDemo();
+        return;
+      }
+
+      const refreshIcon = document.getElementById("refresh-icon");
+      if (refreshIcon) refreshIcon.classList.add("animate-spin");
+
+      try {
+        const urlConParam = appsScriptUrl.includes("?") 
+          ? `${appsScriptUrl}&api=json&_t=${Date.now()}` 
+          : `${appsScriptUrl}?api=json&_t=${Date.now()}`;
+
+        const resp = await fetch(urlConParam);
+        if (!resp.ok) throw new Error("Error en la respuesta: " + resp.status);
+        
+        const data = await resp.json();
+        appData = normalizarDatos(data);
+        renderizarTodo();
+        
+        document.getElementById("error-state").classList.add("hidden");
+        document.getElementById("loading-state").classList.add("hidden");
+        document.getElementById("vista-principal").classList.remove("hidden");
+        
+        actualizarTimestamp();
+      } catch (err) {
+        console.warn("Fallo al conectar con Google Apps Script:", err);
+        let mensajeExtra = "";
+        if (window.location.protocol === "file:") {
+          mensajeExtra = " Nota: Al abrir el archivo directamente en local con doble clic (file://), algunos navegadores bloquean la conexión por seguridad CORS. Al publicarlo en GitHub Pages (https://) o con un servidor local funcionará perfectamente.";
+        }
+        document.getElementById("error-msg").textContent = (err.message || "Error de conexión.") + mensajeExtra;
+        if (!appData) {
+          document.getElementById("error-state").classList.remove("hidden");
+          document.getElementById("loading-state").classList.add("hidden");
+        }
+      } finally {
+        if (refreshIcon) refreshIcon.classList.remove("animate-spin");
+      }
+    }
+
+    function usarDatosDemo() {
+      appData = DEMO_DATA;
+      document.getElementById("error-state").classList.add("hidden");
+      document.getElementById("loading-state").classList.add("hidden");
+      document.getElementById("vista-principal").classList.remove("hidden");
+      renderizarTodo();
+      actualizarTimestamp("(Modo Demo)");
+    }
+
+    function normalizarDatos(raw) {
+      return {
+        ControlWeb: raw.ControlWeb || raw.controlWeb || [{ Estado: "INSCRIPCIÓN", Podio: "SI" }],
+        PutxerasInscritas: raw.PutxerasInscritas || raw.putxerasInscritas || [],
+        PutxerasPoblaciones: raw.PutxerasPoblaciones || raw.putxerasPoblaciones || [],
+        Putxeras: raw.Putxeras || raw.putxeras || [],
+        VotacionB5es: raw.VotacionB5es || raw.votacionB5es || raw.VotacionB5 || [],
+        VotacionG10es: raw.VotacionG10es || raw.votacionG10es || raw.VotacionG10 || [],
+        VotacionG11es: raw.VotacionG11es || raw.votacionG11es || raw.VotacionG11 || [],
+        Clasificaciones: raw.Clasificaciones || raw.clasificaciones || raw.Clasificacion || [],
+        Basauris: raw.Basauris || raw.basauris || raw.Basauri || [],
+        Transparencia: raw.Transparencia || raw.transparencia || []
+      };
+    }
+
+    function renderizarTodo() {
+      if (!appData) return;
+
+      const control = (appData.ControlWeb && appData.ControlWeb[0]) ? appData.ControlWeb[0] : { Estado: "INSCRIPCIÓN", Podio: "SI" };
+      const estado = (control.Estado || "INSCRIPCIÓN").toUpperCase();
+
+      const badgeFase = document.getElementById("fase-badge");
+      badgeFase.textContent = estado;
+
+      document.getElementById("seccion-inscripcion").classList.add("hidden");
+      document.getElementById("seccion-votacion").classList.add("hidden");
+      document.getElementById("seccion-clasificacion").classList.add("hidden");
+
+      if (estado.includes("INSCRI")) {
+        document.getElementById("seccion-inscripcion").classList.remove("hidden");
+        badgeFase.className = "px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider text-xs bg-blue-500/20 text-blue-300 border border-blue-500/40";
+        renderizarInscripcion();
+      } else if (estado.includes("VOTA")) {
+        document.getElementById("seccion-votacion").classList.remove("hidden");
+        badgeFase.className = "px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider text-xs bg-amber-500/20 text-amber-300 border border-amber-500/40";
+        renderizarVotacion();
+      } else if (estado.includes("CLASIFI")) {
+        document.getElementById("seccion-clasificacion").classList.remove("hidden");
+        badgeFase.className = "px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
+        renderizarClasificacion(control.Podio);
+      }
+
+      renderizarTransparencia();
+      renderizarPoblaciones();
+      lucide.createIcons();
+    }
+
+    function renderizarInscripcion() {
+      let gastos = 0, ingresos = 0, boletos = 0;
+      (appData.Transparencia || []).forEach(item => {
+        const euros = Number(item.Euros) || 0;
+        if (item.Tipo === "Gasto") {
+          gastos += euros;
+        } else {
+          ingresos += euros;
+          if (item.Concepto !== "Inscripciones") boletos += euros;
+        }
+      });
+
+      const balance = ingresos - gastos;
+      const banner = document.getElementById("banner-recaudacion");
+
+      if (balance >= 0) {
+        banner.className = "rounded-3xl p-6 sm:p-8 border border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50/50 shadow-sm";
+        banner.innerHTML = `
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-4 text-center sm:text-left">
+              <div class="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-md">
+                <i data-lucide="check-circle" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-emerald-700">Concurso Viable</span>
+                <h3 class="text-lg sm:text-xl font-display font-extrabold text-emerald-950 mt-0.5">¡Gracias por hacer viable este concurso!</h3>
+                <p class="text-xs sm:text-sm text-emerald-800/80">Recaudado para la próxima edición: <strong>${formatearEuros(balance)} €</strong></p>
+              </div>
+            </div>
+            <button onclick="cambiarVista('transparencia')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-sm whitespace-nowrap">
+              Ver Cuentas
+            </button>
+          </div>
+        `;
+      } else {
+        const falta = Math.abs(balance);
+        banner.className = "rounded-3xl p-6 sm:p-8 border border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50/50 shadow-sm";
+        banner.innerHTML = `
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-4 text-center sm:text-left">
+              <div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-md">
+                <i data-lucide="ticket" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-amber-700">Participa en el sorteo de la putxera</span>
+                <h3 class="text-lg sm:text-xl font-display font-extrabold text-amber-950 mt-0.5">Colabora para hacer viable este concurso</h3>
+                <p class="text-xs sm:text-sm text-amber-900/80">Comprando tu boleto ayudas a la fiesta. ¡Solo faltan <strong>${formatearEuros(falta)} €</strong>!</p>
+              </div>
+            </div>
+            <button onclick="cambiarVista('transparencia')" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition shadow-sm whitespace-nowrap">
+              Ver Cuentas
+            </button>
+          </div>
+        `;
+      }
+
+      const totalPutxeras = (appData.PutxerasInscritas && appData.PutxerasInscritas[0]) 
+        ? appData.PutxerasInscritas[0].Putxeras 
+        : (appData.Putxeras ? appData.Putxeras.length : 0);
+      document.getElementById("stat-total-putxeras").textContent = totalPutxeras || 0;
+      document.getElementById("stat-total-pueblos").textContent = (appData.PutxerasPoblaciones || []).length;
+
+      filtrarInscritos();
+    }
+
+    function filtrarInscritos() {
+      const q = (document.getElementById("search-inscripcion").value || "").toLowerCase().trim();
+      const tbody = document.getElementById("tbody-inscripcion");
+      tbody.innerHTML = "";
+
+      const lista = appData.Putxeras || [];
+      let visibles = 0;
+
+      lista.forEach(p => {
+        const num = String(p.Putxera || "");
+        const nombre = String(p.Nombre || "");
+        const poblacion = String(p.Poblacion || "");
+        const barrio = String(p.Barrio || "");
+        const prov = String(p.Provincia || "");
+
+        const textoBusqueda = `${num} ${nombre} ${poblacion} ${barrio} ${prov}`.toLowerCase();
+        if (q && !textoBusqueda.includes(q)) return;
+
+        visibles++;
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-amber-50/40 transition";
+        
+        let localidadCompleta = poblacion;
+        if (barrio) localidadCompleta = `${barrio} (${poblacion})`;
+        if (prov && prov.toLowerCase() !== "bizkaia") localidadCompleta += ` (${prov})`;
+
+        tr.innerHTML = `
+          <td class="py-3 px-6 text-center font-display font-black text-amber-800">#${num}</td>
+          <td class="py-3 px-6 text-stone-900 font-bold">${escapeHtml(nombre)}</td>
+          <td class="py-3 px-6 text-stone-600 text-xs">${escapeHtml(localidadCompleta)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById("sin-resultados-inscripcion").classList.toggle("hidden", visibles > 0);
+    }
+
+    function renderizarVotacion() {
+      renderizarTablaSimple("tbody-votacion-b5", appData.VotacionB5es || [], "badge-count-b5");
+      renderizarTablaSimple("tbody-votacion-g10", appData.VotacionG10es || [], "badge-count-g10");
+      renderizarTablaSimple("tbody-votacion-g11", appData.VotacionG11es || [], "badge-count-g11");
+    }
+
+    function renderizarTablaSimple(tbodyId, array, badgeId) {
+      const tbody = document.getElementById(tbodyId);
+      tbody.innerHTML = "";
+      if (badgeId) document.getElementById(badgeId).textContent = array.length;
+
+      if (!array || array.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-stone-400 text-xs">Sin registros</td></tr>`;
+        return;
+      }
+
+      array.forEach(item => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-stone-50 transition";
+        tr.innerHTML = `
+          <td class="py-2.5 px-6 text-center font-display font-bold text-amber-800">#${item.Putxera}</td>
+          <td class="py-2.5 px-6 font-semibold text-stone-800">${escapeHtml(item.Nombre || "")}</td>
+          <td class="py-2.5 px-6 text-stone-600 text-xs">${escapeHtml(item.Poblacion || "")}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderizarClasificacion(mostrarPodio = "SI") {
+      const clasifs = appData.Clasificaciones || [];
+      const basauris = appData.Basauris || [];
+
+      let primero = 1, segundo = 2, tercero = 3;
+      clasifs.forEach(c => {
+        if (c.General == 1 && c.Basauri == "BASAURI") {
+          primero++; segundo++; tercero++;
+        } else if (c.General == 2 && c.Basauri == "BASAURI") {
+          segundo++; tercero++;
+        } else if (c.General == 3 && c.Basauri == "BASAURI") {
+          tercero++;
+        }
+      });
+
+      const bloquePodio = document.getElementById("bloque-podio");
+      if (mostrarPodio === "NO") {
+        bloquePodio.classList.add("hidden");
+      } else {
+        bloquePodio.classList.remove("hidden");
+        const p1 = clasifs.find(c => c.General == primero) || {};
+        const p2 = clasifs.find(c => c.General == segundo) || {};
+        const p3 = clasifs.find(c => c.General == tercero) || {};
+
+        asignarDatosPodio("p1", p1);
+        asignarDatosPodio("p2", p2);
+        asignarDatosPodio("p3", p3);
+      }
+
+      const localWinner = basauris.find(b => b.Basauri == 1) || {};
+      document.getElementById("local-nombre").textContent = localWinner.Nombre || "---";
+      document.getElementById("local-num").textContent = localWinner.Putxera ? `Putxera Nº ${localWinner.Putxera} (${localWinner.Poblacion || "Basauri"})` : "---";
+      document.getElementById("local-total").textContent = localWinner.Total || "0";
+      document.getElementById("local-sabor").textContent = localWinner.Sabor || "0";
+      document.getElementById("local-punto").textContent = localWinner.Punto || "0";
+      document.getElementById("local-presencia").textContent = localWinner.Presencia || "0";
+
+      filtrarClasificacion();
+    }
+
+    function asignarDatosPodio(prefix, data) {
+      document.getElementById(`${prefix}-nombre`).textContent = data.Nombre || "---";
+      document.getElementById(`${prefix}-pueblo`).textContent = data.Poblacion || "---";
+      document.getElementById(`${prefix}-num`).textContent = data.Putxera || "--";
+      document.getElementById(`${prefix}-puntos`).textContent = data.Total || "0";
+      document.getElementById(`${prefix}-sabor`).textContent = data.Sabor || "0";
+      document.getElementById(`${prefix}-punto`).textContent = data.Punto || "0";
+      document.getElementById(`${prefix}-presencia`).textContent = data.Presencia || "0";
+    }
+
+    function filtrarClasificacion() {
+      const q = (document.getElementById("search-clasificacion").value || "").toLowerCase().trim();
+      const tbody = document.getElementById("tbody-clasificacion");
+      tbody.innerHTML = "";
+
+      const lista = appData.Clasificaciones || [];
+      let visibles = 0;
+
+      lista.forEach(c => {
+        if (!c.Putxera || Number(c.Putxera) <= 0) return;
+
+        const puesto = String(c.General || "");
+        const num = String(c.Putxera || "");
+        const nombre = String(c.Nombre || "");
+        const poblacion = String(c.Poblacion || "");
+
+        const texto = `${puesto} ${num} ${nombre} ${poblacion}`.toLowerCase();
+        if (q && !texto.includes(q)) return;
+
+        visibles++;
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-amber-50/40 transition";
+
+        let badgePremio = "";
+        if (c.General == 1) {
+          badgePremio = `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300">1º PREMIO</span>`;
+        } else if (c.General == 2) {
+          badgePremio = `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-200 text-slate-700">2º PREMIO</span>`;
+        } else if (c.General == 3) {
+          badgePremio = `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-orange-100 text-orange-800">3º PREMIO</span>`;
+        }
+        if (c.Basauri === "BASAURI") {
+          badgePremio += `<span class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">LOCAL</span>`;
+        }
+
+        tr.innerHTML = `
+          <td class="py-3 px-6 text-center font-display font-extrabold text-stone-900">${c.General}º</td>
+          <td class="py-3 px-4 text-center font-mono font-bold text-amber-800">#${c.Putxera}</td>
+          <td class="py-3 px-6">
+            <span class="font-bold text-stone-900">${escapeHtml(nombre)}</span>
+            ${badgePremio}
+          </td>
+          <td class="py-3 px-4 text-stone-600 text-xs">${escapeHtml(poblacion)}</td>
+          <td class="py-3 px-3 text-center text-stone-600 text-xs font-semibold hidden sm:table-cell">${c.Sabor || 0}</td>
+          <td class="py-3 px-3 text-center text-stone-600 text-xs font-semibold hidden sm:table-cell">${c.Punto || 0}</td>
+          <td class="py-3 px-3 text-center text-stone-600 text-xs font-semibold hidden sm:table-cell">${c.Presencia || 0}</td>
+          <td class="py-3 px-6 text-right font-display font-black text-stone-900 text-base">${c.Total || 0} <span class="text-[10px] font-semibold text-stone-400">pts</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById("sin-resultados-clasificacion").classList.toggle("hidden", visibles > 0);
+    }
+
+    function renderizarTransparencia() {
+      const tbody = document.getElementById("tbody-transparencia");
+      tbody.innerHTML = "";
+
+      let gastos = 0, ingresos = 0;
+      const lista = appData.Transparencia || [];
+
+      lista.forEach(item => {
+        const euros = Number(item.Euros) || 0;
+        const esGasto = item.Tipo === "Gasto";
+        if (esGasto) gastos += euros; else ingresos += euros;
+
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-stone-50 transition";
+        tr.innerHTML = `
+          <td class="py-3.5 px-6 font-semibold text-stone-800">${escapeHtml(item.Concepto || "")}</td>
+          <td class="py-3.5 px-6 text-center">
+            <span class="px-2.5 py-1 rounded-full text-xs font-bold ${esGasto ? 'bg-red-50 text-red-700' : 'bg-emerald-50 text-emerald-700'}">
+              ${esGasto ? 'Gasto' : 'Ingreso'}
+            </span>
+          </td>
+          <td class="py-3.5 px-6 text-right font-mono font-bold ${esGasto ? 'text-red-600' : 'text-emerald-600'}">
+            ${esGasto ? '-' : '+'}${formatearEuros(euros)} €
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      const balance = ingresos - gastos;
+      const card = document.getElementById("transparencia-balance-card");
+      card.className = `p-6 rounded-2xl border ${balance >= 0 ? 'bg-emerald-50/50 border-emerald-200' : 'bg-amber-50/50 border-amber-200'}`;
+      card.innerHTML = `
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center sm:text-left">
+          <div>
+            <span class="text-xs font-bold text-stone-500 uppercase tracking-wider">Total Ingresos</span>
+            <p class="text-2xl font-display font-black text-emerald-600 mt-1">+${formatearEuros(ingresos)} €</p>
+          </div>
+          <div>
+            <span class="text-xs font-bold text-stone-500 uppercase tracking-wider">Total Gastos</span>
+            <p class="text-2xl font-display font-black text-red-600 mt-1">-${formatearEuros(gastos)} €</p>
+          </div>
+          <div>
+            <span class="text-xs font-bold text-stone-500 uppercase tracking-wider">Balance Neto</span>
+            <p class="text-2xl font-display font-black ${balance >= 0 ? 'text-emerald-700' : 'text-amber-700'} mt-1">${balance >= 0 ? '+' : ''}${formatearEuros(balance)} €</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderizarPoblaciones() {
+      const grid = document.getElementById("grid-poblaciones");
+      grid.innerHTML = "";
+
+      const lista = appData.PutxerasPoblaciones || [];
+      lista.forEach(p => {
+        const div = document.createElement("div");
+        div.className = "bg-stone-50 p-4 rounded-2xl border border-stone-200/60 flex items-center justify-between";
+        div.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs">
+              📍
+            </div>
+            <span class="font-bold text-stone-800 text-sm">${escapeHtml(p.Poblacion || "")}</span>
+          </div>
+          <span class="px-3 py-1 bg-white border border-stone-200 rounded-xl font-display font-black text-stone-900 text-sm">
+            ${p.Putxeras} <span class="text-[10px] text-stone-400 font-semibold">putxeras</span>
+          </span>
+        `;
+        grid.appendChild(div);
+      });
+    }
+
+    function cambiarVista(vista) {
+      document.getElementById("vista-principal").classList.add("hidden");
+      document.getElementById("vista-transparencia").classList.add("hidden");
+      document.getElementById("vista-poblaciones").classList.add("hidden");
+
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.classList.remove("text-amber-700", "border-b-2", "border-amber-600", "font-bold");
+        btn.classList.add("text-stone-500");
+      });
+
+      const btnActivo = document.getElementById(`tab-${vista}`);
+      if (btnActivo) {
+        btnActivo.classList.remove("text-stone-500");
+        btnActivo.classList.add("text-amber-700", "border-b-2", "border-amber-600", "font-bold");
+      }
+
+      document.getElementById(`vista-${vista}`).classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function toggleConfigModal() {
+      const modal = document.getElementById("config-modal");
+      modal.classList.toggle("hidden");
+    }
+
+    function guardarConfiguracion() {
+      const url = document.getElementById("input-apps-script-url").value.trim();
+      localStorage.setItem("SANJUANTXINES_API_URL", url);
+      appsScriptUrl = url || URL_APPS_SCRIPT_DEFAULT;
+      appData = null; // Limpiar datos en memoria para forzar recarga real
+      toggleConfigModal();
+      cargarDatos(true);
+    }
+
+    function probarFase(fase) {
+      if (!appData) appData = DEMO_DATA;
+      appData.ControlWeb = [{ Estado: fase, Podio: "SI" }];
+      toggleConfigModal();
+      cambiarVista("principal");
+      renderizarTodo();
+    }
+
+    function actualizarTimestamp(extra = "") {
+      const ahora = new Date();
+      const horas = String(ahora.getHours()).padStart(2, "0");
+      const mins = String(ahora.getMinutes()).padStart(2, "0");
+      const secs = String(ahora.getSeconds()).padStart(2, "0");
+      document.getElementById("sync-time").textContent = `Actualizado ${horas}:${mins}:${secs} ${extra}`;
+    }
+
+    function formatearEuros(num) {
+      return Number(num).toLocaleString("es-ES");
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>
