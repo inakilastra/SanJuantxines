@@ -93,60 +93,49 @@
 
   <!-- ================= TOPBAR & CABECERA ================= -->
   <header class="md:sticky md:top-0 z-40 bg-stone-900/95 backdrop-blur-md border-b border-stone-800 text-white transition-all">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-3">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
       
-      <!-- Identidad y Título -->
-      <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
-        <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
-          <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-stone-800/80 border border-amber-500/30 flex items-center justify-center shadow-lg shadow-amber-500/10 overflow-hidden shrink-0">
-            <img src="img/juantxin.png" alt="San Juantxines" class="w-full h-full object-contain p-0.5">
-          </div>
-          <div class="min-w-0">
-            <div class="flex items-center gap-2 flex-wrap">
-              <span class="text-[10px] sm:text-xs uppercase tracking-wider sm:tracking-widest font-bold text-amber-400 truncate">San Juantxines · Basauri</span>
+      <!-- Identidad: Juantxin grande a la izquierda sin borde + texto a la derecha -->
+      <div class="flex items-center gap-3.5 sm:gap-4 w-full min-w-0">
+        <img src="img/juantxin.png" alt="San Juantxines" class="w-24 h-24 sm:w-14 sm:h-14 object-contain shrink-0">
+
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-4 flex-1 min-w-0">
+          <div class="flex flex-col items-start gap-1 min-w-0">
+            <!-- Línea 1 (San Juantxines - Basauri) y Línea 2 (En directo) -->
+            <div class="flex flex-col sm:flex-row sm:items-center items-start gap-1 sm:gap-2">
+              <span class="text-xs uppercase tracking-wider sm:tracking-widest font-bold text-amber-400">San Juantxines - Basauri</span>
               <span id="badge-live" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 whitespace-nowrap shrink-0">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 live-dot"></span>
                 EN DIRECTO
               </span>
             </div>
-            <h1 class="text-base sm:text-xl font-display font-bold text-white tracking-tight truncate">Concurso de Putxeras</h1>
+
+            <!-- Línea 3: Concurso de Putxeras -->
+            <h1 class="text-lg sm:text-xl font-display font-bold text-white tracking-tight leading-tight">Concurso de Putxeras</h1>
+          </div>
+
+          <!-- Línea 4 en móvil / Derecha en desktop: Fase -->
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="text-stone-400 hidden md:inline text-xs">Fase:</span>
+            <span id="fase-badge" class="px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider text-[11px] sm:text-xs bg-amber-500/20 text-amber-300 border border-amber-500/40 whitespace-nowrap">
+              Cargando...
+            </span>
           </div>
         </div>
+      </div>
 
-        <!-- Botón de ajustes de conexión (móvil) -->
-        <!--<button onclick="toggleConfigModal()" class="sm:hidden p-2 rounded-lg text-stone-400 hover:text-white hover:bg-stone-800 shrink-0" title="Configurar origen de datos">
-          <i data-lucide="settings" class="w-5 h-5"></i>-->
+      <!-- Botones opcionales comentados
+      <div class="flex items-center gap-2 shrink-0">
+        <span id="sync-time" class="text-stone-400 hidden lg:inline text-xs">Sincronizando...</span>
+        <button id="btn-refresh" onclick="cargarDatos(true)" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 active:scale-95 text-stone-200 hover:text-white font-medium border border-stone-700 transition text-xs">
+          <i data-lucide="refresh-cw" id="refresh-icon" class="w-3.5 h-3.5"></i>
+          <span>Actualizar</span>
+        </button>
+        <button onclick="toggleConfigModal()" class="p-2 rounded-lg text-stone-400 hover:text-white hover:bg-stone-800 transition" title="Configurar conexión con Google Sheets">
+          <i data-lucide="settings" class="w-4 h-4"></i>
         </button>
       </div>
-
-      <!-- Estado actual y controles de actualización -->
-      <div class="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto text-xs">
-        
-        <!-- Estado actual del concurso (Badge) -->
-        <div class="flex items-center gap-2">
-          <span class="text-stone-400 hidden md:inline">Fase:</span>
-          <span id="fase-badge" class="px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider text-[11px] sm:text-xs bg-amber-500/20 text-amber-300 border border-amber-500/40 whitespace-nowrap">
-            Cargando...
-          </span>
-        </div>
-
-        <div class="h-4 w-px bg-stone-700 hidden sm:block"></div>
-
-        <!-- Botón refrescar y última sincronización -->
-        <!--<div class="flex items-center gap-2">
-          <span id="sync-time" class="text-stone-400 hidden lg:inline">Sincronizando...</span>
-          <button id="btn-refresh" onclick="cargarDatos(true)" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 active:scale-95 text-stone-200 hover:text-white font-medium border border-stone-700 transition">
-            <i data-lucide="refresh-cw" id="refresh-icon" class="w-3.5 h-3.5"></i>
-            <span>Actualizar</span>
-          </button>-->
-          
-          <!-- Botón de ajustes de conexión (desktop) -->
-          <!--<button onclick="toggleConfigModal()" class="hidden sm:flex p-2 rounded-lg text-stone-400 hover:text-white hover:bg-stone-800 transition" title="Configurar conexión con Google Sheets">
-            <i data-lucide="settings" class="w-4 h-4"></i>
-          </button>
-        </div>-->
-
-      </div>
+      -->
 
     </div>
   </header>
@@ -1281,11 +1270,13 @@
     }
 
     function actualizarTimestamp(extra = "") {
+      const syncEl = document.getElementById("sync-time");
+      if (!syncEl) return;
       const ahora = new Date();
       const horas = String(ahora.getHours()).padStart(2, "0");
       const mins = String(ahora.getMinutes()).padStart(2, "0");
       const secs = String(ahora.getSeconds()).padStart(2, "0");
-      document.getElementById("sync-time").textContent = `Actualizado ${horas}:${mins}:${secs} ${extra}`;
+      syncEl.textContent = `Actualizado ${horas}:${mins}:${secs} ${extra}`;
     }
 
     function formatearEuros(num) {
