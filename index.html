@@ -834,7 +834,7 @@
       } else if (estado.includes("CLASIFI")) {
         document.getElementById("seccion-clasificacion").classList.remove("hidden");
         badgeFase.className = "px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
-        renderizarClasificacion(control.Podio);
+        renderizarClasificacion();
       }
 
       renderizarTransparencia();
@@ -972,7 +972,7 @@
       });
     }
 
-    function renderizarClasificacion(mostrarPodio = "SI") {
+    function renderizarClasificacion() {
       const clasifs = appData.Clasificaciones || [];
       const basauris = appData.Basauris || [];
 
@@ -988,18 +988,15 @@
       });
 
       const bloquePodio = document.getElementById("bloque-podio");
-      if (mostrarPodio === "NO") {
-        bloquePodio.classList.add("hidden");
-      } else {
-        bloquePodio.classList.remove("hidden");
-        const p1 = clasifs.find(c => c.General == primero) || {};
-        const p2 = clasifs.find(c => c.General == segundo) || {};
-        const p3 = clasifs.find(c => c.General == tercero) || {};
+      bloquePodio.classList.remove("hidden");
 
-        asignarDatosPodio("p1", p1);
-        asignarDatosPodio("p2", p2);
-        asignarDatosPodio("p3", p3);
-      }
+      const p1 = clasifs.find(c => c.General == primero) || {};
+      const p2 = clasifs.find(c => c.General == segundo) || {};
+      const p3 = clasifs.find(c => c.General == tercero) || {};
+
+      asignarDatosPodio("p1", p1);
+      asignarDatosPodio("p2", p2);
+      asignarDatosPodio("p3", p3);
 
       const localWinner = basauris.find(b => b.Basauri == 1) || {};
       document.getElementById("local-nombre").textContent = localWinner.Nombre || "---";
