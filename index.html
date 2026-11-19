@@ -92,29 +92,29 @@
 <body class="min-h-screen flex flex-col font-sans antialiased text-stone-800 selection:bg-amber-500 selection:text-white">
 
   <!-- ================= TOPBAR & CABECERA ================= -->
-  <header class="sticky top-0 z-40 bg-stone-900/95 backdrop-blur-md border-b border-stone-800 text-white transition-all">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3">
+  <header class="md:sticky md:top-0 z-40 bg-stone-900/95 backdrop-blur-md border-b border-stone-800 text-white transition-all">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-3">
       
       <!-- Identidad y Título -->
       <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
-        <div class="flex items-center gap-3">
-          <div class="w-11 h-11 rounded-xl bg-stone-800/80 border border-amber-500/30 flex items-center justify-center shadow-lg shadow-amber-500/10 overflow-hidden shrink-0">
+        <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+          <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-stone-800/80 border border-amber-500/30 flex items-center justify-center shadow-lg shadow-amber-500/10 overflow-hidden shrink-0">
             <img src="img/juantxin.png" alt="San Juantxines" class="w-full h-full object-contain p-0.5">
           </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="text-xs uppercase tracking-widest font-bold text-amber-400">San Juantxines · Basauri</span>
-              <span id="badge-live" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-[10px] sm:text-xs uppercase tracking-wider sm:tracking-widest font-bold text-amber-400 truncate">San Juantxines · Basauri</span>
+              <span id="badge-live" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 whitespace-nowrap shrink-0">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 live-dot"></span>
                 EN DIRECTO
               </span>
             </div>
-            <h1 class="text-lg sm:text-xl font-display font-bold text-white tracking-tight">Concurso de Putxeras</h1>
+            <h1 class="text-base sm:text-xl font-display font-bold text-white tracking-tight truncate">Concurso de Putxeras</h1>
           </div>
         </div>
 
         <!-- Botón de ajustes de conexión (móvil) -->
-        <button onclick="toggleConfigModal()" class="sm:hidden p-2 rounded-lg text-stone-400 hover:text-white hover:bg-stone-800" title="Configurar origen de datos">
+        <button onclick="toggleConfigModal()" class="sm:hidden p-2 rounded-lg text-stone-400 hover:text-white hover:bg-stone-800 shrink-0" title="Configurar origen de datos">
           <i data-lucide="settings" class="w-5 h-5"></i>
         </button>
       </div>
@@ -125,7 +125,7 @@
         <!-- Estado actual del concurso (Badge) -->
         <div class="flex items-center gap-2">
           <span class="text-stone-400 hidden md:inline">Fase:</span>
-          <span id="fase-badge" class="px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider text-xs bg-amber-500/20 text-amber-300 border border-amber-500/40">
+          <span id="fase-badge" class="px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider text-[11px] sm:text-xs bg-amber-500/20 text-amber-300 border border-amber-500/40 whitespace-nowrap">
             Cargando...
           </span>
         </div>
@@ -152,20 +152,20 @@
   </header>
 
   <!-- ================= SUB-NAVEGACIÓN (TABS) ================= -->
-  <nav class="bg-white border-b border-stone-200 sticky top-[69px] sm:top-[65px] z-30 shadow-sm">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6">
-      <div class="flex items-center space-x-2 sm:space-x-8 overflow-x-auto py-2.5 no-scrollbar text-sm font-semibold text-stone-500">
-        <button onclick="cambiarVista('principal')" id="tab-principal" class="tab-btn active text-amber-700 border-b-2 border-amber-600 pb-1.5 px-2 flex items-center gap-2 whitespace-nowrap">
-          <i data-lucide="trophy" class="w-4 h-4"></i>
+  <nav class="bg-white border-b border-stone-200 sticky top-0 md:top-[65px] z-30 shadow-sm">
+    <div class="max-w-6xl mx-auto px-3 sm:px-6">
+      <div class="flex items-center justify-between sm:justify-start sm:space-x-8 overflow-x-auto py-2.5 no-scrollbar text-xs sm:text-sm font-semibold text-stone-500">
+        <button onclick="cambiarVista('principal')" id="tab-principal" class="tab-btn active text-amber-700 border-b-2 border-amber-600 pb-1.5 px-2 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap">
+          <i data-lucide="trophy" class="w-4 h-4 shrink-0"></i>
           <span id="tab-principal-title">Concurso</span>
         </button>
-        <button onclick="cambiarVista('transparencia')" id="tab-transparencia" class="tab-btn hover:text-stone-800 pb-1.5 px-2 flex items-center gap-2 whitespace-nowrap">
-          <i data-lucide="coins" class="w-4 h-4"></i>
-          <span>El Txokito de la Transparencia</span>
+        <button onclick="cambiarVista('transparencia')" id="tab-transparencia" class="tab-btn hover:text-stone-800 pb-1.5 px-2 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap">
+          <i data-lucide="coins" class="w-4 h-4 shrink-0"></i>
+          <span><span class="hidden sm:inline">El Txokito de la </span>Transparencia</span>
         </button>
-        <button onclick="cambiarVista('poblaciones')" id="tab-poblaciones" class="tab-btn hover:text-stone-800 pb-1.5 px-2 flex items-center gap-2 whitespace-nowrap">
-          <i data-lucide="map-pin" class="w-4 h-4"></i>
-          <span>Participación por Pueblos</span>
+        <button onclick="cambiarVista('poblaciones')" id="tab-poblaciones" class="tab-btn hover:text-stone-800 pb-1.5 px-2 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap">
+          <i data-lucide="map-pin" class="w-4 h-4 shrink-0"></i>
+          <span><span class="hidden sm:inline">Participación por </span>Pueblos</span>
         </button>
       </div>
     </div>
@@ -259,8 +259,13 @@
             </div>
           </div>
 
-          <!-- Tabla de inscritos -->
-          <div class="overflow-x-auto">
+          <!-- Vista móvil en tarjetas (Putxeras Inscritas) -->
+          <div id="cards-inscripcion-mobile" class="md:hidden divide-y divide-stone-100">
+            <!-- Generado dinámicamente -->
+          </div>
+
+          <!-- Tabla de inscritos (Escritorio) -->
+          <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-left text-sm">
               <thead class="bg-stone-50/70 text-stone-600 font-bold uppercase text-[11px] tracking-wider border-b border-stone-100">
                 <tr>
@@ -320,9 +325,9 @@
               <table class="w-full text-left text-sm">
                 <thead class="bg-stone-50/70 text-stone-600 font-bold uppercase text-[11px] tracking-wider border-b border-stone-100">
                   <tr>
-                    <th class="py-3 px-6 w-24 text-center">Nº</th>
-                    <th class="py-3 px-6">Nombre</th>
-                    <th class="py-3 px-6">Población</th>
+                    <th class="py-3 px-3 sm:px-6 w-14 sm:w-24 text-center">Nº</th>
+                    <th class="py-3 px-3 sm:px-6">Nombre</th>
+                    <th class="py-3 px-3 sm:px-6">Población</th>
                   </tr>
                 </thead>
                 <tbody id="tbody-votacion-b5" class="divide-y divide-stone-100"></tbody>
@@ -348,9 +353,9 @@
               <table class="w-full text-left text-sm">
                 <thead class="bg-stone-50/70 text-stone-600 font-bold uppercase text-[11px] tracking-wider border-b border-stone-100">
                   <tr>
-                    <th class="py-3 px-6 w-24 text-center">Nº</th>
-                    <th class="py-3 px-6">Nombre</th>
-                    <th class="py-3 px-6">Población</th>
+                    <th class="py-3 px-3 sm:px-6 w-14 sm:w-24 text-center">Nº</th>
+                    <th class="py-3 px-3 sm:px-6">Nombre</th>
+                    <th class="py-3 px-3 sm:px-6">Población</th>
                   </tr>
                 </thead>
                 <tbody id="tbody-votacion-g10" class="divide-y divide-stone-100"></tbody>
@@ -376,9 +381,9 @@
               <table class="w-full text-left text-sm">
                 <thead class="bg-stone-50/70 text-stone-600 font-bold uppercase text-[11px] tracking-wider border-b border-stone-100">
                   <tr>
-                    <th class="py-3 px-6 w-24 text-center">Nº</th>
-                    <th class="py-3 px-6">Nombre</th>
-                    <th class="py-3 px-6">Población</th>
+                    <th class="py-3 px-3 sm:px-6 w-14 sm:w-24 text-center">Nº</th>
+                    <th class="py-3 px-3 sm:px-6">Nombre</th>
+                    <th class="py-3 px-3 sm:px-6">Población</th>
                   </tr>
                 </thead>
                 <tbody id="tbody-votacion-g11" class="divide-y divide-stone-100"></tbody>
@@ -525,7 +530,13 @@
             </div>
           </div>
 
-          <div class="overflow-x-auto">
+          <!-- Vista móvil en tarjetas (100% legible sin scroll horizontal) -->
+          <div id="cards-clasificacion-mobile" class="md:hidden divide-y divide-stone-100">
+            <!-- Generado dinámicamente -->
+          </div>
+
+          <!-- Vista escritorio en tabla -->
+          <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-left text-sm">
               <thead class="bg-stone-50/70 text-stone-600 font-bold uppercase text-[11px] tracking-wider border-b border-stone-100">
                 <tr>
@@ -533,9 +544,9 @@
                   <th class="py-3.5 px-4 w-20 text-center">Nº</th>
                   <th class="py-3.5 px-6">Participante / Cuadrilla</th>
                   <th class="py-3.5 px-4">Localidad</th>
-                  <th class="py-3.5 px-3 text-center hidden sm:table-cell">Sabor</th>
-                  <th class="py-3.5 px-3 text-center hidden sm:table-cell">Punto</th>
-                  <th class="py-3.5 px-3 text-center hidden sm:table-cell">Presencia</th>
+                  <th class="py-3.5 px-3 text-center">Sabor</th>
+                  <th class="py-3.5 px-3 text-center">Punto</th>
+                  <th class="py-3.5 px-3 text-center">Presencia</th>
                   <th class="py-3.5 px-6 text-right font-black">Total Pts</th>
                 </tr>
               </thead>
@@ -573,9 +584,9 @@
           <table class="w-full text-left text-sm">
             <thead class="bg-stone-50 text-stone-600 font-bold uppercase text-[11px] tracking-wider">
               <tr>
-                <th class="py-3.5 px-6">Concepto</th>
-                <th class="py-3.5 px-6 text-center w-36">Tipo</th>
-                <th class="py-3.5 px-6 text-right w-40">Importe</th>
+                <th class="py-3.5 px-3 sm:px-6">Concepto</th>
+                <th class="py-3.5 px-2 sm:px-6 text-center w-24 sm:w-36">Tipo</th>
+                <th class="py-3.5 px-3 sm:px-6 text-right w-24 sm:w-40">Importe</th>
               </tr>
             </thead>
             <tbody id="tbody-transparencia" class="divide-y divide-stone-100 font-medium"></tbody>
@@ -910,7 +921,9 @@
     function filtrarInscritos() {
       const q = (document.getElementById("search-inscripcion").value || "").toLowerCase().trim();
       const tbody = document.getElementById("tbody-inscripcion");
+      const cardsMobile = document.getElementById("cards-inscripcion-mobile");
       tbody.innerHTML = "";
+      cardsMobile.innerHTML = "";
 
       const lista = appData.Putxeras || [];
       let visibles = 0;
@@ -926,19 +939,33 @@
         if (q && !textoBusqueda.includes(q)) return;
 
         visibles++;
-        const tr = document.createElement("tr");
-        tr.className = "hover:bg-amber-50/40 transition";
-        
         let localidadCompleta = poblacion;
         if (barrio) localidadCompleta = `${barrio} (${poblacion})`;
         if (prov && prov.toLowerCase() !== "bizkaia") localidadCompleta += ` (${prov})`;
 
+        // Fila escritorio
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-amber-50/40 transition";
         tr.innerHTML = `
           <td class="py-3 px-6 text-center font-display font-black text-amber-800">#${num}</td>
           <td class="py-3 px-6 text-stone-900 font-bold">${escapeHtml(nombre)}</td>
           <td class="py-3 px-6 text-stone-600 text-xs">${escapeHtml(localidadCompleta)}</td>
         `;
         tbody.appendChild(tr);
+
+        // Tarjeta móvil
+        const card = document.createElement("div");
+        card.className = "p-4 flex items-center gap-3 hover:bg-amber-50/40 transition";
+        card.innerHTML = `
+          <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200/70 text-amber-800 font-display font-black text-sm flex items-center justify-center shrink-0">
+            #${num}
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="font-bold text-stone-900 text-sm truncate">${escapeHtml(nombre)}</div>
+            <div class="text-xs text-stone-500 truncate mt-0.5">${escapeHtml(localidadCompleta)}</div>
+          </div>
+        `;
+        cardsMobile.appendChild(card);
       });
 
       document.getElementById("sin-resultados-inscripcion").classList.toggle("hidden", visibles > 0);
@@ -964,9 +991,9 @@
         const tr = document.createElement("tr");
         tr.className = "hover:bg-stone-50 transition";
         tr.innerHTML = `
-          <td class="py-2.5 px-6 text-center font-display font-bold text-amber-800">#${item.Putxera}</td>
-          <td class="py-2.5 px-6 font-semibold text-stone-800">${escapeHtml(item.Nombre || "")}</td>
-          <td class="py-2.5 px-6 text-stone-600 text-xs">${escapeHtml(item.Poblacion || "")}</td>
+          <td class="py-2.5 px-3 sm:px-6 text-center font-display font-bold text-amber-800 whitespace-nowrap">#${item.Putxera}</td>
+          <td class="py-2.5 px-3 sm:px-6 font-semibold text-stone-800">${escapeHtml(item.Nombre || "")}</td>
+          <td class="py-2.5 px-3 sm:px-6 text-stone-600 text-xs">${escapeHtml(item.Poblacion || "")}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -1022,7 +1049,9 @@
     function filtrarClasificacion() {
       const q = (document.getElementById("search-clasificacion").value || "").toLowerCase().trim();
       const tbody = document.getElementById("tbody-clasificacion");
+      const cardsMobile = document.getElementById("cards-clasificacion-mobile");
       tbody.innerHTML = "";
+      cardsMobile.innerHTML = "";
 
       const lista = appData.Clasificaciones || [];
       let visibles = 0;
@@ -1039,35 +1068,79 @@
         if (q && !texto.includes(q)) return;
 
         visibles++;
-        const tr = document.createElement("tr");
-        tr.className = "hover:bg-amber-50/40 transition";
 
-        let badgePremio = "";
+        let badgePremioDesktop = "";
+        let badgePremioMobile = "";
+        let puestoStyle = "bg-stone-100 text-stone-900";
+
         if (c.General == 1) {
-          badgePremio = `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300">1º PREMIO</span>`;
+          badgePremioDesktop = `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300 whitespace-nowrap">1º PREMIO</span>`;
+          badgePremioMobile = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300 whitespace-nowrap">1º PREMIO</span>`;
+          puestoStyle = "bg-amber-400 text-stone-900 shadow-sm";
         } else if (c.General == 2) {
-          badgePremio = `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-200 text-slate-700">2º PREMIO</span>`;
+          badgePremioDesktop = `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-200 text-slate-700 whitespace-nowrap">2º PREMIO</span>`;
+          badgePremioMobile = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-200 text-slate-700 whitespace-nowrap">2º PREMIO</span>`;
+          puestoStyle = "bg-slate-200 text-slate-900";
         } else if (c.General == 3) {
-          badgePremio = `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-orange-100 text-orange-800">3º PREMIO</span>`;
+          badgePremioDesktop = `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-orange-100 text-orange-800 whitespace-nowrap">3º PREMIO</span>`;
+          badgePremioMobile = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-orange-100 text-orange-800 whitespace-nowrap">3º PREMIO</span>`;
+          puestoStyle = "bg-orange-200 text-orange-950";
         }
         if (c.Basauri === "BASAURI") {
-          badgePremio += `<span class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">LOCAL</span>`;
+          badgePremioDesktop += `<span class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300 whitespace-nowrap">LOCAL</span>`;
+          badgePremioMobile += `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300 whitespace-nowrap">LOCAL</span>`;
         }
 
+        // Fila escritorio
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-amber-50/40 transition";
         tr.innerHTML = `
           <td class="py-3 px-6 text-center font-display font-extrabold text-stone-900">${c.General}º</td>
           <td class="py-3 px-4 text-center font-mono font-bold text-amber-800">#${c.Putxera}</td>
           <td class="py-3 px-6">
             <span class="font-bold text-stone-900">${escapeHtml(nombre)}</span>
-            ${badgePremio}
+            ${badgePremioDesktop}
           </td>
           <td class="py-3 px-4 text-stone-600 text-xs">${escapeHtml(poblacion)}</td>
-          <td class="py-3 px-3 text-center text-stone-600 text-xs font-semibold hidden sm:table-cell">${c.Sabor || 0}</td>
-          <td class="py-3 px-3 text-center text-stone-600 text-xs font-semibold hidden sm:table-cell">${c.Punto || 0}</td>
-          <td class="py-3 px-3 text-center text-stone-600 text-xs font-semibold hidden sm:table-cell">${c.Presencia || 0}</td>
+          <td class="py-3 px-3 text-center text-stone-600 text-xs font-semibold">${c.Sabor || 0}</td>
+          <td class="py-3 px-3 text-center text-stone-600 text-xs font-semibold">${c.Punto || 0}</td>
+          <td class="py-3 px-3 text-center text-stone-600 text-xs font-semibold">${c.Presencia || 0}</td>
           <td class="py-3 px-6 text-right font-display font-black text-stone-900 text-base">${c.Total || 0} <span class="text-[10px] font-semibold text-stone-400">pts</span></td>
         `;
         tbody.appendChild(tr);
+
+        // Tarjeta móvil
+        const card = document.createElement("div");
+        card.className = "p-4 flex items-center justify-between gap-3 hover:bg-amber-50/40 transition";
+        card.innerHTML = `
+          <div class="flex items-start gap-3 min-w-0 flex-1">
+            <div class="w-9 h-9 rounded-xl ${puestoStyle} font-display font-extrabold text-sm flex items-center justify-center shrink-0 mt-0.5">
+              ${c.General}º
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="font-mono font-bold text-xs text-amber-700 shrink-0">#${c.Putxera}</span>
+                <span class="font-bold text-stone-900 text-sm break-words">${escapeHtml(nombre)}</span>
+              </div>
+              <div class="flex items-center gap-1.5 flex-wrap mt-1">
+                <span class="text-xs text-stone-500">${escapeHtml(poblacion)}</span>
+                ${badgePremioMobile}
+              </div>
+              <div class="flex items-center gap-2 mt-1.5 text-[11px] text-stone-500 flex-wrap">
+                <span>Sabor: <strong class="text-stone-700">${c.Sabor || 0}</strong></span>
+                <span class="text-stone-300">·</span>
+                <span>Punto: <strong class="text-stone-700">${c.Punto || 0}</strong></span>
+                <span class="text-stone-300">·</span>
+                <span>Pres: <strong class="text-stone-700">${c.Presencia || 0}</strong></span>
+              </div>
+            </div>
+          </div>
+          <div class="text-right shrink-0 pl-2">
+            <div class="text-xl font-display font-black text-stone-900 leading-none">${c.Total || 0}</div>
+            <div class="text-[10px] font-semibold text-stone-400 uppercase mt-0.5">pts</div>
+          </div>
+        `;
+        cardsMobile.appendChild(card);
       });
 
       document.getElementById("sin-resultados-clasificacion").classList.toggle("hidden", visibles > 0);
@@ -1088,13 +1161,13 @@
         const tr = document.createElement("tr");
         tr.className = "hover:bg-stone-50 transition";
         tr.innerHTML = `
-          <td class="py-3.5 px-6 font-semibold text-stone-800">${escapeHtml(item.Concepto || "")}</td>
-          <td class="py-3.5 px-6 text-center">
-            <span class="px-2.5 py-1 rounded-full text-xs font-bold ${esGasto ? 'bg-red-50 text-red-700' : 'bg-emerald-50 text-emerald-700'}">
+          <td class="py-3.5 px-3 sm:px-6 font-semibold text-stone-800">${escapeHtml(item.Concepto || "")}</td>
+          <td class="py-3.5 px-2 sm:px-6 text-center">
+            <span class="px-2.5 py-1 rounded-full text-xs font-bold whitespace-nowrap ${esGasto ? 'bg-red-50 text-red-700' : 'bg-emerald-50 text-emerald-700'}">
               ${esGasto ? 'Gasto' : 'Ingreso'}
             </span>
           </td>
-          <td class="py-3.5 px-6 text-right font-mono font-bold ${esGasto ? 'text-red-600' : 'text-emerald-600'}">
+          <td class="py-3.5 px-3 sm:px-6 text-right font-mono font-bold whitespace-nowrap ${esGasto ? 'text-red-600' : 'text-emerald-600'}">
             ${esGasto ? '-' : '+'}${formatearEuros(euros)} €
           </td>
         `;
