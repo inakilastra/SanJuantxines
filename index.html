@@ -1007,31 +1007,58 @@
       });
     }
 
+    function obtenerMapaPremios(clasifs, basauris) {
+      const ganadoresBasauri = (basauris || [])
+        .filter(b => Number(b.Basauri) === 1)
+        .map(b => Number(b.Putxera));
+
+      const esBasauri = (c) =>
+        String(c.Basauri || "").trim().toUpperCase() === "BASAURI" ||
+        ganadoresBasauri.includes(Number(c.Putxera));
+
+      const validos = (clasifs || []).filter(c => c.Putxera && Number(c.Putxera) > 0);
+      const elegibles = validos.filter(c => !esBasauri(c));
+
+      // Puestos distintos entre quienes optan a 1º, 2º y 3º premio (si hay empate con el de Basauri, no se salta el puesto)
+      const puestosElegibles = [];
+      elegibles.forEach(c => {
+        const g = Number(c.General);
+        if (!puestosElegibles.includes(g)) {
+          puestosElegibles.push(g);
+        }
+      });
+      puestosElegibles.sort((a, b) => a - b);
+
+      const puestoPrimerPremio = puestosElegibles[0];
+      const puestoSegundoPremio = puestosElegibles[1];
+      const puestoTercerPremio = puestosElegibles[2];
+
+      const p1 = elegibles.find(c => Number(c.General) === puestoPrimerPremio) || {};
+      const p2 = elegibles.find(c => Number(c.General) === puestoSegundoPremio) || {};
+      const p3 = elegibles.find(c => Number(c.General) === puestoTercerPremio) || {};
+
+      return {
+        esBasauri,
+        puestoPrimerPremio,
+        puestoSegundoPremio,
+        puestoTercerPremio,
+        p1,
+        p2,
+        p3
+      };
+    }
+
     function renderizarClasificacion() {
       const clasifs = appData.Clasificaciones || [];
       const basauris = appData.Basauris || [];
-
-      let primero = 1, segundo = 2, tercero = 3;
-      clasifs.forEach(c => {
-        if (c.General == 1 && c.Basauri == "BASAURI") {
-          primero++; segundo++; tercero++;
-        } else if (c.General == 2 && c.Basauri == "BASAURI") {
-          segundo++; tercero++;
-        } else if (c.General == 3 && c.Basauri == "BASAURI") {
-          tercero++;
-        }
-      });
+      const premios = obtenerMapaPremios(clasifs, basauris);
 
       const bloquePodio = document.getElementById("bloque-podio");
       bloquePodio.classList.remove("hidden");
 
-      const p1 = clasifs.find(c => c.General == primero) || {};
-      const p2 = clasifs.find(c => c.General == segundo) || {};
-      const p3 = clasifs.find(c => c.General == tercero) || {};
-
-      asignarDatosPodio("p1", p1);
-      asignarDatosPodio("p2", p2);
-      asignarDatosPodio("p3", p3);
+      asignarDatosPodio("p1", premios.p1);
+      asignarDatosPodio("p2", premios.p2);
+      asignarDatosPodio("p3", premios.p3);
 
       const localWinner = basauris.find(b => b.Basauri == 1) || {};
       document.getElementById("local-nombre").textContent = localWinner.Nombre || "---";
@@ -1063,21 +1090,7 @@
 
       const lista = appData.Clasificaciones || [];
       const basauris = appData.Basauris || [];
-      const ganadoresBasauri = basauris
-        .filter(b => Number(b.Basauri) === 1)
-        .map(b => Number(b.Putxera));
-
-      // Respetar el corrimiento de premios si algún puesto del podio tiene premio Basauri
-      let primero = 1, segundo = 2, tercero = 3;
-      lista.forEach(c => {
-        if (c.General == 1 && String(c.Basauri || "").trim().toUpperCase() === "BASAURI") {
-          primero++; segundo++; tercero++;
-        } else if (c.General == 2 && String(c.Basauri || "").trim().toUpperCase() === "BASAURI") {
-          segundo++; tercero++;
-        } else if (c.General == 3 && String(c.Basauri || "").trim().toUpperCase() === "BASAURI") {
-          tercero++;
-        }
-      });
+      const premios = obtenerMapaPremios(lista, basauris);
 
       let visibles = 0;
 
@@ -1094,28 +1107,26 @@
 
         visibles++;
 
-        const tienePremioBasauri =
-          String(c.Basauri || "").trim().toUpperCase() === "BASAURI" ||
-          ganadoresBasauri.includes(Number(c.Putxera));
+        const tienePremioBasauri = premios.esBasauri(c);
 
         let badgePremioDesktop = "";
         let badgePremioMobile = "";
         let puestoStyle = "bg-stone-100 text-stone-900";
 
         if (tienePremioBasauri) {
-          // Si tiene premio Basauri, se omite el otro premio
+          // Si tiene premio Basauri, renuncia al 1º, 2º o 3º y mantiene su puesto
           badgePremioDesktop = `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300 whitespace-nowrap">PREMIO BASAURI</span>`;
           badgePremioMobile = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300 whitespace-nowrap">PREMIO BASAURI</span>`;
           puestoStyle = "bg-emerald-100 text-emerald-900 border border-emerald-300";
-        } else if (Number(c.General) === primero) {
+        } else if (Number(c.General) === premios.puestoPrimerPremio) {
           badgePremioDesktop = `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300 whitespace-nowrap">1º PREMIO</span>`;
           badgePremioMobile = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300 whitespace-nowrap">1º PREMIO</span>`;
           puestoStyle = "bg-amber-400 text-stone-900 shadow-sm";
-        } else if (Number(c.General) === segundo) {
+        } else if (Number(c.General) === premios.puestoSegundoPremio) {
           badgePremioDesktop = `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-200 text-slate-700 whitespace-nowrap">2º PREMIO</span>`;
           badgePremioMobile = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-200 text-slate-700 whitespace-nowrap">2º PREMIO</span>`;
           puestoStyle = "bg-slate-200 text-slate-900";
-        } else if (Number(c.General) === tercero) {
+        } else if (Number(c.General) === premios.puestoTercerPremio) {
           badgePremioDesktop = `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-orange-100 text-orange-800 whitespace-nowrap">3º PREMIO</span>`;
           badgePremioMobile = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-orange-100 text-orange-800 whitespace-nowrap">3º PREMIO</span>`;
           puestoStyle = "bg-orange-200 text-orange-950";
