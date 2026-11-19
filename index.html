@@ -1054,6 +1054,23 @@
       cardsMobile.innerHTML = "";
 
       const lista = appData.Clasificaciones || [];
+      const basauris = appData.Basauris || [];
+      const ganadoresBasauri = basauris
+        .filter(b => Number(b.Basauri) === 1)
+        .map(b => Number(b.Putxera));
+
+      // Respetar el corrimiento de premios si algún puesto del podio tiene premio Basauri
+      let primero = 1, segundo = 2, tercero = 3;
+      lista.forEach(c => {
+        if (c.General == 1 && String(c.Basauri || "").trim().toUpperCase() === "BASAURI") {
+          primero++; segundo++; tercero++;
+        } else if (c.General == 2 && String(c.Basauri || "").trim().toUpperCase() === "BASAURI") {
+          segundo++; tercero++;
+        } else if (c.General == 3 && String(c.Basauri || "").trim().toUpperCase() === "BASAURI") {
+          tercero++;
+        }
+      });
+
       let visibles = 0;
 
       lista.forEach(c => {
@@ -1069,26 +1086,31 @@
 
         visibles++;
 
+        const tienePremioBasauri =
+          String(c.Basauri || "").trim().toUpperCase() === "BASAURI" ||
+          ganadoresBasauri.includes(Number(c.Putxera));
+
         let badgePremioDesktop = "";
         let badgePremioMobile = "";
         let puestoStyle = "bg-stone-100 text-stone-900";
 
-        if (c.General == 1) {
+        if (tienePremioBasauri) {
+          // Si tiene premio Basauri, se omite el otro premio
+          badgePremioDesktop = `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300 whitespace-nowrap">PREMIO BASAURI</span>`;
+          badgePremioMobile = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300 whitespace-nowrap">PREMIO BASAURI</span>`;
+          puestoStyle = "bg-emerald-100 text-emerald-900 border border-emerald-300";
+        } else if (Number(c.General) === primero) {
           badgePremioDesktop = `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300 whitespace-nowrap">1º PREMIO</span>`;
           badgePremioMobile = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300 whitespace-nowrap">1º PREMIO</span>`;
           puestoStyle = "bg-amber-400 text-stone-900 shadow-sm";
-        } else if (c.General == 2) {
+        } else if (Number(c.General) === segundo) {
           badgePremioDesktop = `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-200 text-slate-700 whitespace-nowrap">2º PREMIO</span>`;
           badgePremioMobile = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-200 text-slate-700 whitespace-nowrap">2º PREMIO</span>`;
           puestoStyle = "bg-slate-200 text-slate-900";
-        } else if (c.General == 3) {
+        } else if (Number(c.General) === tercero) {
           badgePremioDesktop = `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-orange-100 text-orange-800 whitespace-nowrap">3º PREMIO</span>`;
           badgePremioMobile = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-orange-100 text-orange-800 whitespace-nowrap">3º PREMIO</span>`;
           puestoStyle = "bg-orange-200 text-orange-950";
-        }
-        if (c.Basauri === "BASAURI") {
-          badgePremioDesktop += `<span class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300 whitespace-nowrap">LOCAL</span>`;
-          badgePremioMobile += `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300 whitespace-nowrap">LOCAL</span>`;
         }
 
         // Fila escritorio
@@ -1109,7 +1131,7 @@
         `;
         tbody.appendChild(tr);
 
-        // Tarjeta móvil
+        // Tarjeta móvil (4 líneas claras)
         const card = document.createElement("div");
         card.className = "p-4 flex items-center justify-between gap-3 hover:bg-amber-50/40 transition";
         card.innerHTML = `
@@ -1117,16 +1139,14 @@
             <div class="w-9 h-9 rounded-xl ${puestoStyle} font-display font-extrabold text-sm flex items-center justify-center shrink-0 mt-0.5">
               ${c.General}º
             </div>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center gap-1.5 flex-wrap">
-                <span class="font-mono font-bold text-xs text-amber-700 shrink-0">#${c.Putxera}</span>
-                <span class="font-bold text-stone-900 text-sm break-words">${escapeHtml(nombre)}</span>
-              </div>
-              <div class="flex items-center gap-1.5 flex-wrap mt-1">
-                <span class="text-xs text-stone-500">${escapeHtml(poblacion)}</span>
+            <div class="min-w-0 flex-1 space-y-0.5">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-mono font-bold text-xs text-amber-800">Putxera ${c.Putxera}</span>
                 ${badgePremioMobile}
               </div>
-              <div class="flex items-center gap-2 mt-1.5 text-[11px] text-stone-500 flex-wrap">
+              <div class="font-bold text-stone-900 text-sm break-words">${escapeHtml(nombre)}</div>
+              <div class="text-xs text-stone-500">${escapeHtml(poblacion)}</div>
+              <div class="flex items-center gap-2 pt-1 text-[11px] text-stone-500 flex-wrap">
                 <span>Sabor: <strong class="text-stone-700">${c.Sabor || 0}</strong></span>
                 <span class="text-stone-300">·</span>
                 <span>Punto: <strong class="text-stone-700">${c.Punto || 0}</strong></span>
