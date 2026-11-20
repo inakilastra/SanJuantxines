@@ -163,6 +163,22 @@
   <!-- ================= CUERPO PRINCIPAL ================= -->
   <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-8">
 
+    <!-- ================= SELLO OFICIAL DEL ORGANIZADOR ================= -->
+    <div class="bg-gradient-to-r from-stone-900 via-stone-900 to-amber-950 rounded-3xl p-4 sm:p-5 border border-amber-500/30 shadow-lg flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3.5 sm:gap-5 min-w-0">
+        <img src="img/SanJuantxines2.jpeg" alt="SanJuantxines Kultur Elkartea" class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-amber-400/50 shadow-lg shadow-amber-500/20 shrink-0">
+        <div class="min-w-0">
+          <span class="inline-block text-[10px] sm:text-xs font-extrabold uppercase tracking-widest text-amber-400">Organiza</span>
+          <h2 class="text-base sm:text-xl font-display font-extrabold text-white tracking-tight leading-snug break-words">SanJuantxines Kultur Elkartea</h2>
+          <p class="text-xs text-stone-300 mt-0.5">Basauri · Concurso de Putxeras</p>
+        </div>
+      </div>
+      <div class="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-amber-500/10 border border-amber-400/20 text-amber-300 text-xs font-bold shrink-0">
+        <i data-lucide="flame" class="w-4 h-4 text-amber-400"></i>
+        <span>Basauri</span>
+      </div>
+    </div>
+
     <!-- Loading skeleton / Indicador de carga inicial -->
     <div id="loading-state" class="text-center py-20 space-y-4">
       <div class="inline-block p-4 rounded-2xl bg-amber-100 text-amber-700 animate-bounce">
@@ -611,10 +627,13 @@
   <!-- ================= FOOTER ================= -->
   <footer class="bg-stone-900 text-stone-400 text-xs py-8 border-t border-stone-800 mt-12">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-2">
-        <span class="font-display font-bold text-white text-sm">🍲 San Juantxines</span>
-        <span class="text-stone-500">·</span>
-        <span>Concurso de Putxeras de Basauri</span>
+      <div class="flex items-center gap-3">
+        <img src="img/SanJuantxines2.jpeg" alt="SanJuantxines Kultur Elkartea" class="w-8 h-8 rounded-lg object-cover border border-amber-500/40 shrink-0">
+        <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+          <span class="font-display font-bold text-white text-sm">SanJuantxines Kultur Elkartea</span>
+          <span class="text-stone-500">·</span>
+          <span>Concurso de Putxeras de Basauri</span>
+        </div>
       </div>
       <!--<div class="flex items-center gap-4 text-stone-400">
         <span id="footer-update-text">Conexión con Google Sheets activa</span>
