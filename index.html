@@ -1219,12 +1219,15 @@
       });
     }
 
-    function obtenerMapaPremios(clasifs, basauris) {
-      const ganadoresBasauri = (basauris || [])
-        .filter(b => Number(b.Basauri) === 1)
-        .map(b => Number(b.Putxera));
+    function obtenerMapaPremios(clasifs, basauris, sinPremioBasauri = false) {
+      const ganadoresBasauri = sinPremioBasauri
+        ? []
+        : (basauris || [])
+            .filter(b => Number(b.Basauri) === 1)
+            .map(b => Number(b.Putxera));
 
       const esBasauri = (c) => {
+        if (sinPremioBasauri) return false;
         const val = String(c.Basauri || "").trim().toUpperCase();
         const marcadoEnFila = ["BASAURI", "1", "SI", "SÍ", "X", "LOCAL", "PREMIO LOCAL"].includes(val);
         return marcadoEnFila || ganadoresBasauri.includes(Number(c.Putxera));
@@ -1638,7 +1641,8 @@
         lista.sort((a, b) => (Number(a.General) || 999) - (Number(b.General) || 999));
       }
 
-      const premios = obtenerMapaPremios(lista, []);
+      const sinPremioBasauri = (anio === "2023");
+      const premios = obtenerMapaPremios(lista, [], sinPremioBasauri);
       document.getElementById("hist-badge-anio").textContent = `Edición ${anio}`;
       document.getElementById("hist-tabla-titulo").textContent = `Clasificación General · ${anio}`;
 
@@ -1674,7 +1678,8 @@
       cardsMobile.innerHTML = "";
 
       const lista = (appData && appData.Historico && appData.Historico[historicoAnioActual]) || [];
-      const premios = obtenerMapaPremios(lista, []);
+      const sinPremioBasauri = (historicoAnioActual === "2023");
+      const premios = obtenerMapaPremios(lista, [], sinPremioBasauri);
       let visibles = 0;
 
       lista.forEach(c => {
