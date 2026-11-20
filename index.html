@@ -875,10 +875,10 @@
   <!-- ================= LÓGICA JAVASCRIPT ================= -->
   <script>
     // URL del Google Apps Script en vivo y ID de hoja de cálculo
-    const URL_APPS_SCRIPT_DEFAULT = "https://script.google.com/macros/s/AKfycbxA1s66_Nqf_daXuxbXwxQ1mOkUsXLFNVa9qrqL4N32mM-i_KRvJAaHF-wc56k0GkIMdQ/exec";
+    const URL_APPS_SCRIPT_DEFAULT = "https://script.google.com/macros/s/AKfycbzhKN_lPneHFXNEZWduIhuh2AnMGMjDPFTlSmzTvHi__xoD4Bb__Oa8lVccc_Q397m98g/exec";
     const SPREADSHEET_ID = "1vBkln5NjLvkbeTUC0tpf4yobTiJtW_CYI05BPAEqZFg";
     const ANIOS_HISTORICO_DEFAULT = ["2025", "2024", "2023"];
-    let appsScriptUrl = localStorage.getItem("SANJUANTXINES_API_URL") || URL_APPS_SCRIPT_DEFAULT;
+    let appsScriptUrl = URL_APPS_SCRIPT_DEFAULT;
     let appData = null;
     let autoRefreshInterval = null;
     let historicoAnioActual = null;

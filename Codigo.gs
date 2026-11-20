@@ -74,8 +74,12 @@ function leerHojaClasificacion(sheet) {
   var idxPresencia = findCol(['presencia'], 4);
   var idxPunto = findCol(['punto'], 5);
   var idxSabor = findCol(['sabor'], 6);
-  var idxBasauri = findCol(['basauri', 'local'], 7);
+  var idxBasauri = findCol(['basauri', 'local'], -1);
   var idxGeneral = findCol(['general', 'puesto', 'pos'], 8);
+  if (idxBasauri === -1 && headers.length >= 9 && headers.indexOf('nombre') !== -1) {
+    // Si tiene 9 columnas o más y cabecera estándar, comprobamos si col 7 no es General
+    if (idxGeneral !== 7) idxBasauri = 7;
+  }
 
   var dataRows = values.slice(headerRowIdx + 1);
   var lista = [];
@@ -86,13 +90,13 @@ function leerHojaClasificacion(sheet) {
     lista.push({
       Putxera: putxeraNum,
       Nombre: nombre,
-      Poblacion: String(row[idxPoblacion] || '').trim(),
-      Total: extraerNumero(row[idxTotal]),
-      Presencia: extraerNumero(row[idxPresencia]),
-      Punto: extraerNumero(row[idxPunto]),
-      Sabor: extraerNumero(row[idxSabor]),
-      Basauri: idxBasauri < row.length ? String(row[idxBasauri] || '').trim() : '',
-      General: extraerNumero(row[idxGeneral])
+      Poblacion: idxPoblacion >= 0 && idxPoblacion < row.length ? String(row[idxPoblacion] || '').trim() : '',
+      Total: idxTotal >= 0 && idxTotal < row.length ? extraerNumero(row[idxTotal]) : 0,
+      Presencia: idxPresencia >= 0 && idxPresencia < row.length ? extraerNumero(row[idxPresencia]) : 0,
+      Punto: idxPunto >= 0 && idxPunto < row.length ? extraerNumero(row[idxPunto]) : 0,
+      Sabor: idxSabor >= 0 && idxSabor < row.length ? extraerNumero(row[idxSabor]) : 0,
+      Basauri: (idxBasauri >= 0 && idxBasauri !== idxGeneral && idxBasauri < row.length) ? String(row[idxBasauri] || '').trim() : '',
+      General: idxGeneral >= 0 && idxGeneral < row.length ? extraerNumero(row[idxGeneral]) : 0
     });
   });
 
