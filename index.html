@@ -1618,12 +1618,25 @@
       }
 
       if (!lista || lista.length === 0) {
+        const tieneHistoricoEnApi = appData && appData.Historico && Object.keys(appData.Historico).length > 0;
+        const msgEl = document.getElementById("historico-empty-msg");
+        if (!tieneHistoricoEnApi) {
+          msgEl.innerHTML = 'Tu Google Apps Script todavía no está devolviendo los datos históricos. Pega el nuevo <code>Codigo.gs</code> en <strong>script.google.com</strong> y recuerda ir a <strong>Implementar &gt; Administrar implementaciones &gt; Editar (lápiz) &gt; Versión: Nueva versión &gt; Implementar</strong>.';
+        } else {
+          msgEl.innerHTML = `No se encontraron datos válidos en la pestaña <strong>P${anio}</strong> de tu hoja de cálculo.`;
+        }
         emptyEl.classList.remove("hidden");
         return;
       }
 
-      // Ordenar por puesto General ascendente si está disponible
-      lista.sort((a, b) => (Number(a.General) || 999) - (Number(b.General) || 999));
+      // Si alguna edición histórica no trajera columna General rellena, asignamos puesto por orden
+      const tieneGeneral = lista.some(c => Number(c.General) > 0);
+      if (!tieneGeneral) {
+        lista.sort((a, b) => (Number(b.Total) || 0) - (Number(a.Total) || 0));
+        lista.forEach((c, idx) => { c.General = idx + 1; });
+      } else {
+        lista.sort((a, b) => (Number(a.General) || 999) - (Number(b.General) || 999));
+      }
 
       const premios = obtenerMapaPremios(lista, []);
       document.getElementById("hist-badge-anio").textContent = `Edición ${anio}`;

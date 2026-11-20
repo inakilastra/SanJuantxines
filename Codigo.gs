@@ -24,15 +24,41 @@ function leerHojaClasificacion(sheet) {
   var values = sheet.getDataRange().getValues();
   if (values.length <= 1) return [];
 
-  var headers = values[0].map(function (h) {
-    return String(h || '')
+  function norm(txt) {
+    return String(txt || '')
       .toLowerCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .trim();
-  });
+  }
+
+  function extraerNumero(val) {
+    if (typeof val === 'number') return isNaN(val) ? 0 : val;
+    var s = String(val || '').replace(',', '.').replace(/[^0-9.\-]/g, '');
+    var n = parseFloat(s);
+    return isNaN(n) ? 0 : n;
+  }
+
+  // Buscar fila de cabeceras (normalmente fila 0, pero por si hay título arriba revisamos hasta fila 2)
+  var headerRowIdx = 0;
+  for (var r = 0; r < Math.min(3, values.length); r++) {
+    var rowStr = values[r].map(norm).join(' ');
+    if (rowStr.indexOf('nombre') !== -1 || rowStr.indexOf('putxera') !== -1 || rowStr.indexOf('sabor') !== -1) {
+      headerRowIdx = r;
+      break;
+    }
+  }
+
+  var headers = values[headerRowIdx].map(norm);
 
   function findCol(keywords, fallbackIdx) {
+    // Primero coincidencia exacta
+    for (var i = 0; i < headers.length; i++) {
+      for (var k = 0; k < keywords.length; k++) {
+        if (headers[i] === keywords[k]) return i;
+      }
+    }
+    // Luego coincidencia parcial
     for (var i = 0; i < headers.length; i++) {
       for (var k = 0; k < keywords.length; k++) {
         if (headers[i].indexOf(keywords[k]) !== -1) return i;
@@ -41,8 +67,8 @@ function leerHojaClasificacion(sheet) {
     return fallbackIdx;
   }
 
-  var idxPutxera = findCol(['putxera', 'num', 'nº'], 0);
-  var idxNombre = findCol(['nombre', 'cuadrilla'], 1);
+  var idxPutxera = findCol(['putxera', 'nº', 'num', 'numero'], 0);
+  var idxNombre = findCol(['nombre', 'cuadrilla', 'participante'], 1);
   var idxPoblacion = findCol(['poblacion', 'localidad', 'pueblo'], 2);
   var idxTotal = findCol(['total', 'puntos'], 3);
   var idxPresencia = findCol(['presencia'], 4);
@@ -51,21 +77,22 @@ function leerHojaClasificacion(sheet) {
   var idxBasauri = findCol(['basauri', 'local'], 7);
   var idxGeneral = findCol(['general', 'puesto', 'pos'], 8);
 
-  values.shift();
+  var dataRows = values.slice(headerRowIdx + 1);
   var lista = [];
-  values.forEach(function (row) {
-    var putxeraNum = Number(row[idxPutxera]) || 0;
-    if (putxeraNum <= 0 && !row[idxNombre]) return;
+  dataRows.forEach(function (row) {
+    var putxeraNum = extraerNumero(row[idxPutxera]);
+    var nombre = String(row[idxNombre] || '').trim();
+    if (putxeraNum <= 0 && !nombre) return;
     lista.push({
       Putxera: putxeraNum,
-      Nombre: String(row[idxNombre] || '').trim(),
+      Nombre: nombre,
       Poblacion: String(row[idxPoblacion] || '').trim(),
-      Total: Number(row[idxTotal]) || 0,
-      Presencia: Number(row[idxPresencia]) || 0,
-      Punto: Number(row[idxPunto]) || 0,
-      Sabor: Number(row[idxSabor]) || 0,
+      Total: extraerNumero(row[idxTotal]),
+      Presencia: extraerNumero(row[idxPresencia]),
+      Punto: extraerNumero(row[idxPunto]),
+      Sabor: extraerNumero(row[idxSabor]),
       Basauri: idxBasauri < row.length ? String(row[idxBasauri] || '').trim() : '',
-      General: Number(row[idxGeneral]) || 0
+      General: extraerNumero(row[idxGeneral])
     });
   });
 
@@ -181,8 +208,10 @@ function doGet(e) {
 
   // 11. Histórico automático: busca todas las pestañas llamadas P2023, P2024, P2025, etc.
   var Historico = {};
+  var DebugHojas = [];
   SW.getSheets().forEach(function (sheet) {
     var name = sheet.getName().trim();
+    DebugHojas.push(name);
     if (/^P\d{4}$/i.test(name)) {
       var year = name.substring(1); // "2023", "2024", "2025"...
       Historico[year] = leerHojaClasificacion(sheet);
@@ -201,6 +230,7 @@ function doGet(e) {
     Basauris: Basauris,
     Transparencia: Transparencia,
     Historico: Historico,
+    DebugHojas: DebugHojas,
     timestamp: new Date().toISOString()
   };
 
