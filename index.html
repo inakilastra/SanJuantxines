@@ -143,18 +143,22 @@
   <!-- ================= SUB-NAVEGACIÓN (TABS) ================= -->
   <nav class="bg-white border-b border-stone-200 sticky top-0 md:top-[81px] z-30 shadow-sm">
     <div class="max-w-6xl mx-auto px-3 sm:px-6">
-      <div class="flex items-center justify-between sm:justify-start sm:space-x-8 overflow-x-auto py-2.5 no-scrollbar text-xs sm:text-sm font-semibold text-stone-500">
-        <button onclick="cambiarVista('principal')" id="tab-principal" class="tab-btn active text-amber-700 border-b-2 border-amber-600 pb-1.5 px-2 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap">
-          <i data-lucide="trophy" class="w-4 h-4 shrink-0"></i>
+      <div class="flex items-center justify-between sm:justify-start sm:space-x-8 overflow-x-auto py-2.5 no-scrollbar text-[11px] sm:text-sm font-semibold text-stone-500">
+        <button onclick="cambiarVista('principal')" id="tab-principal" class="tab-btn active text-amber-700 border-b-2 border-amber-600 pb-1.5 px-1.5 sm:px-2 flex items-center gap-1 sm:gap-2 whitespace-nowrap">
+          <i data-lucide="trophy" class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0"></i>
           <span id="tab-principal-title">Concurso</span>
         </button>
-        <button onclick="cambiarVista('transparencia')" id="tab-transparencia" class="tab-btn hover:text-stone-800 pb-1.5 px-2 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap">
-          <i data-lucide="coins" class="w-4 h-4 shrink-0"></i>
+        <button onclick="cambiarVista('transparencia')" id="tab-transparencia" class="tab-btn hover:text-stone-800 pb-1.5 px-1.5 sm:px-2 flex items-center gap-1 sm:gap-2 whitespace-nowrap">
+          <i data-lucide="coins" class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0"></i>
           <span><span class="hidden sm:inline">El Txokito de la </span>Transparencia</span>
         </button>
-        <button onclick="cambiarVista('poblaciones')" id="tab-poblaciones" class="tab-btn hover:text-stone-800 pb-1.5 px-2 flex items-center gap-1.5 sm:gap-2 whitespace-nowrap">
-          <i data-lucide="map-pin" class="w-4 h-4 shrink-0"></i>
+        <button onclick="cambiarVista('poblaciones')" id="tab-poblaciones" class="tab-btn hover:text-stone-800 pb-1.5 px-1.5 sm:px-2 flex items-center gap-1 sm:gap-2 whitespace-nowrap">
+          <i data-lucide="map-pin" class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0"></i>
           <span><span class="hidden sm:inline">Participación por </span>Pueblos</span>
+        </button>
+        <button onclick="cambiarVista('historico')" id="tab-historico" class="tab-btn hover:text-stone-800 pb-1.5 px-1.5 sm:px-2 flex items-center gap-1 sm:gap-2 whitespace-nowrap">
+          <i data-lucide="history" class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0"></i>
+          <span>Histórico</span>
         </button>
       </div>
     </div>
@@ -622,6 +626,182 @@
       </div>
     </div>
 
+    <!-- ================= CONTENEDOR VISTA: HISTÓRICO ================= -->
+    <div id="vista-historico" class="hidden space-y-8">
+      
+      <!-- Cabecera y selector de edición -->
+      <div class="bg-white rounded-3xl border border-stone-200/80 shadow-sm p-6 sm:p-8 space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold shrink-0">
+              <i data-lucide="history" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="text-xl sm:text-2xl font-display font-bold text-stone-900">Archivo Histórico</h2>
+              <p class="text-xs sm:text-sm text-stone-500">Consulta las clasificaciones y podios de ediciones anteriores</p>
+            </div>
+          </div>
+
+          <!-- Botones de año -->
+          <div id="historico-year-buttons" class="flex items-center gap-2 flex-wrap">
+            <!-- Generado dinámicamente -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading específico del histórico (si consulta GViz) -->
+      <div id="historico-loading" class="hidden text-center py-14 space-y-3">
+        <div class="inline-block p-3.5 rounded-2xl bg-amber-100 text-amber-700">
+          <i data-lucide="loader-2" class="w-6 h-6 animate-spin"></i>
+        </div>
+        <p class="text-sm text-stone-600 font-medium">Cargando clasificación histórica...</p>
+      </div>
+
+      <!-- Aviso si no hay datos de histórico todavía -->
+      <div id="historico-empty" class="hidden bg-amber-50 border border-amber-200 rounded-3xl p-6 text-center space-y-2">
+        <h3 class="font-display font-bold text-amber-900 text-base">Edición no disponible aún</h3>
+        <p id="historico-empty-msg" class="text-xs sm:text-sm text-amber-800">
+          Para cargar las pestañas <strong>P2023</strong>, <strong>P2024</strong> y <strong>P2025</strong> desde un Google Sheet privado, actualiza tu Google Apps Script con el nuevo archivo <code>Codigo.gs</code>.
+        </p>
+      </div>
+
+      <!-- Contenido del año seleccionado -->
+      <div id="historico-contenido" class="hidden space-y-10">
+
+        <!-- Podio Histórico -->
+        <div id="hist-podio" class="space-y-4">
+          <div class="text-center max-w-md mx-auto">
+            <span id="hist-badge-anio" class="text-xs uppercase font-extrabold tracking-widest text-amber-600 bg-amber-100/70 px-3 py-1 rounded-full">
+              Edición 2025
+            </span>
+            <h3 class="text-2xl sm:text-3xl font-display font-extrabold text-stone-900 mt-2">Podio de Ganadores</h3>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 pt-6 items-end">
+            <!-- 2º PUESTO -->
+            <div class="order-2 md:order-1 bg-white rounded-3xl p-6 border border-stone-200 shadow-sm relative overflow-hidden flex flex-col items-center text-center">
+              <div class="w-14 h-14 rounded-2xl podio-plata text-stone-900 flex items-center justify-center font-display font-black text-2xl mb-4 shadow-md">2</div>
+              <span class="text-[11px] uppercase tracking-wider font-extrabold text-slate-500 mb-1">Segundo Premio</span>
+              <h4 id="hp2-nombre" class="text-lg font-display font-bold text-stone-900 leading-snug">---</h4>
+              <p id="hp2-pueblo" class="text-xs text-stone-500 mt-0.5">---</p>
+              <div class="mt-4 pt-4 border-t border-stone-100 w-full">
+                <div class="text-xs font-bold text-stone-400 uppercase tracking-wider mb-2">Putxera Nº <span id="hp2-num" class="text-stone-900 font-black">--</span></div>
+                <div class="text-2xl font-display font-extrabold text-stone-900 mb-3"><span id="hp2-puntos">0</span> <span class="text-xs font-bold text-stone-500">pts</span></div>
+                <div class="grid grid-cols-3 gap-1 bg-stone-50 p-2 rounded-xl text-center text-[11px]">
+                  <div><span class="text-stone-400 block text-[9px] uppercase font-bold">Sabor</span><span id="hp2-sabor" class="font-bold text-stone-700">0</span></div>
+                  <div><span class="text-stone-400 block text-[9px] uppercase font-bold">Punto</span><span id="hp2-punto" class="font-bold text-stone-700">0</span></div>
+                  <div><span class="text-stone-400 block text-[9px] uppercase font-bold">Pres.</span><span id="hp2-presencia" class="font-bold text-stone-700">0</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 1º PUESTO -->
+            <div class="order-1 md:order-2 bg-gradient-to-b from-amber-500/10 via-white to-white rounded-3xl p-6 sm:p-8 border-2 border-amber-400 shadow-xl shadow-amber-500/10 relative overflow-hidden flex flex-col items-center text-center -translate-y-2">
+              <div class="absolute top-0 right-0 bg-amber-500 text-stone-900 px-3 py-1 rounded-bl-xl font-display font-extrabold text-[10px] uppercase tracking-widest">Campeón</div>
+              <div class="w-16 h-16 rounded-2xl podio-oro text-stone-900 flex items-center justify-center font-display font-black text-3xl mb-4 shadow-lg">1</div>
+              <span class="text-xs uppercase tracking-wider font-extrabold text-amber-700 mb-1">Primer Premio</span>
+              <h4 id="hp1-nombre" class="text-xl font-display font-extrabold text-stone-900 leading-snug">---</h4>
+              <p id="hp1-pueblo" class="text-sm font-medium text-amber-800/80 mt-0.5">---</p>
+              <div class="mt-4 pt-4 border-t border-amber-200/50 w-full">
+                <div class="text-xs font-bold text-amber-700 uppercase tracking-wider mb-2">Putxera Nº <span id="hp1-num" class="text-stone-900 font-black">--</span></div>
+                <div class="text-3xl font-display font-black text-amber-700 mb-3"><span id="hp1-puntos">0</span> <span class="text-sm font-bold text-stone-500">pts</span></div>
+                <div class="grid grid-cols-3 gap-1 bg-amber-50/80 p-2.5 rounded-xl text-center text-xs border border-amber-200/40">
+                  <div><span class="text-amber-800/60 block text-[10px] uppercase font-bold">Sabor</span><span id="hp1-sabor" class="font-bold text-stone-800">0</span></div>
+                  <div><span class="text-amber-800/60 block text-[10px] uppercase font-bold">Punto</span><span id="hp1-punto" class="font-bold text-stone-800">0</span></div>
+                  <div><span class="text-amber-800/60 block text-[10px] uppercase font-bold">Pres.</span><span id="hp1-presencia" class="font-bold text-stone-800">0</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3º PUESTO -->
+            <div class="order-3 bg-white rounded-3xl p-6 border border-stone-200 shadow-sm relative overflow-hidden flex flex-col items-center text-center">
+              <div class="w-14 h-14 rounded-2xl podio-bronce text-stone-900 flex items-center justify-center font-display font-black text-2xl mb-4 shadow-md">3</div>
+              <span class="text-[11px] uppercase tracking-wider font-extrabold text-orange-700 mb-1">Tercer Premio</span>
+              <h4 id="hp3-nombre" class="text-lg font-display font-bold text-stone-900 leading-snug">---</h4>
+              <p id="hp3-pueblo" class="text-xs text-stone-500 mt-0.5">---</p>
+              <div class="mt-4 pt-4 border-t border-stone-100 w-full">
+                <div class="text-xs font-bold text-stone-400 uppercase tracking-wider mb-2">Putxera Nº <span id="hp3-num" class="text-stone-900 font-black">--</span></div>
+                <div class="text-2xl font-display font-extrabold text-stone-900 mb-3"><span id="hp3-puntos">0</span> <span class="text-xs font-bold text-stone-500">pts</span></div>
+                <div class="grid grid-cols-3 gap-1 bg-stone-50 p-2 rounded-xl text-center text-[11px]">
+                  <div><span class="text-stone-400 block text-[9px] uppercase font-bold">Sabor</span><span id="hp3-sabor" class="font-bold text-stone-700">0</span></div>
+                  <div><span class="text-stone-400 block text-[9px] uppercase font-bold">Punto</span><span id="hp3-punto" class="font-bold text-stone-700">0</span></div>
+                  <div><span class="text-stone-400 block text-[9px] uppercase font-bold">Pres.</span><span id="hp3-presencia" class="font-bold text-stone-700">0</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Premio Local Basauri Histórico (solo se muestra en ediciones que tuvieron premio Basauri) -->
+        <div id="hist-local-basauri" class="hidden bg-gradient-to-br from-stone-900 via-stone-900 to-emerald-950 border border-emerald-500/30 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+          <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-center sm:text-left">
+              <div class="w-20 h-20 rounded-2xl bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center text-4xl shrink-0 shadow-inner">🏅</div>
+              <div>
+                <span class="inline-block px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-[11px] font-extrabold tracking-widest uppercase mb-1.5">Mención Especial</span>
+                <h3 class="text-2xl sm:text-3xl font-display font-extrabold tracking-tight text-white">Premio Local Basauri</h3>
+                <p id="hist-local-nombre" class="text-xl font-bold text-amber-300 mt-1">---</p>
+                <p id="hist-local-num" class="text-xs font-medium text-stone-300 mt-0.5">Putxera Nº --</p>
+              </div>
+            </div>
+            <div class="bg-black/35 backdrop-blur-md border border-white/10 rounded-2xl p-4 sm:p-5 flex items-center gap-6 shrink-0 w-full md:w-auto justify-around">
+              <div class="text-center">
+                <span class="text-xs font-bold text-emerald-300 uppercase tracking-wider block">Total</span>
+                <span id="hist-local-total" class="text-3xl font-display font-black text-white">0</span>
+                <span class="text-[10px] text-stone-300 block">puntos</span>
+              </div>
+              <div class="h-10 w-px bg-white/15"></div>
+              <div class="grid grid-cols-3 gap-4 text-center text-xs">
+                <div><span class="text-stone-400 block text-[10px] uppercase font-bold">Sabor</span><span id="hist-local-sabor" class="font-bold text-base text-white">0</span></div>
+                <div><span class="text-stone-400 block text-[10px] uppercase font-bold">Punto</span><span id="hist-local-punto" class="font-bold text-base text-white">0</span></div>
+                <div><span class="text-stone-400 block text-[10px] uppercase font-bold">Pres.</span><span id="hist-local-presencia" class="font-bold text-base text-white">0</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla y Tarjetas Móviles del Histórico -->
+        <div class="bg-white rounded-3xl border border-stone-200/80 shadow-sm overflow-hidden">
+          <div class="p-6 border-b border-stone-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h3 id="hist-tabla-titulo" class="text-xl font-display font-bold text-stone-900">Clasificación General</h3>
+              <p class="text-xs text-stone-500 mt-0.5">Resultados oficiales registrados</p>
+            </div>
+            <div class="relative w-full md:w-72">
+              <i data-lucide="search" class="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+              <input type="text" id="search-historico" oninput="filtrarHistorico()" placeholder="Buscar por cocinero, nº o puesto..." 
+                     class="w-full pl-9 pr-4 py-2 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition">
+            </div>
+          </div>
+
+          <div id="cards-historico-mobile" class="md:hidden divide-y divide-stone-100"></div>
+
+          <div class="hidden md:block overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-stone-50/70 text-stone-600 font-bold uppercase text-[11px] tracking-wider border-b border-stone-100">
+                <tr>
+                  <th class="py-3.5 px-6 w-20 text-center">Puesto</th>
+                  <th class="py-3.5 px-4 w-20 text-center">Nº</th>
+                  <th class="py-3.5 px-6">Participante / Cuadrilla</th>
+                  <th class="py-3.5 px-4">Localidad</th>
+                  <th class="py-3.5 px-3 text-center">Sabor</th>
+                  <th class="py-3.5 px-3 text-center">Punto</th>
+                  <th class="py-3.5 px-3 text-center">Presencia</th>
+                  <th class="py-3.5 px-6 text-right font-black">Total Pts</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-historico" class="divide-y divide-stone-100 font-medium"></tbody>
+            </table>
+          </div>
+
+          <div id="sin-resultados-historico" class="hidden py-12 text-center text-stone-400 text-sm">
+            No se encontraron participantes con ese criterio de búsqueda.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
   </main>
 
   <!-- ================= FOOTER ================= -->
@@ -694,11 +874,15 @@
 
   <!-- ================= LÓGICA JAVASCRIPT ================= -->
   <script>
-    // URL del Google Apps Script en vivo
+    // URL del Google Apps Script en vivo y ID de hoja de cálculo
     const URL_APPS_SCRIPT_DEFAULT = "https://script.google.com/macros/s/AKfycbxA1s66_Nqf_daXuxbXwxQ1mOkUsXLFNVa9qrqL4N32mM-i_KRvJAaHF-wc56k0GkIMdQ/exec";
+    const SPREADSHEET_ID = "1vBkln5NjLvkbeTUC0tpf4yobTiJtW_CYI05BPAEqZFg";
+    const ANIOS_HISTORICO_DEFAULT = ["2025", "2024", "2023"];
     let appsScriptUrl = localStorage.getItem("SANJUANTXINES_API_URL") || URL_APPS_SCRIPT_DEFAULT;
     let appData = null;
     let autoRefreshInterval = null;
+    let historicoAnioActual = null;
+    let historicoCacheGviz = {};
 
     // Datos demo para pruebas inmediatas si aún no se ha desplegado el Apps Script
     const DEMO_DATA = {
@@ -790,7 +974,12 @@
         
         document.getElementById("error-state").classList.add("hidden");
         document.getElementById("loading-state").classList.add("hidden");
-        document.getElementById("vista-principal").classList.remove("hidden");
+
+        const algunaVistaVisible = ["vista-principal", "vista-transparencia", "vista-poblaciones", "vista-historico"]
+          .some(id => !document.getElementById(id).classList.contains("hidden"));
+        if (!algunaVistaVisible) {
+          document.getElementById("vista-principal").classList.remove("hidden");
+        }
         
         actualizarTimestamp();
       } catch (err) {
@@ -829,7 +1018,8 @@
         VotacionG11es: raw.VotacionG11es || raw.votacionG11es || raw.VotacionG11 || [],
         Clasificaciones: raw.Clasificaciones || raw.clasificaciones || raw.Clasificacion || [],
         Basauris: raw.Basauris || raw.basauris || raw.Basauri || [],
-        Transparencia: raw.Transparencia || raw.transparencia || []
+        Transparencia: raw.Transparencia || raw.transparencia || [],
+        Historico: raw.Historico || raw.historico || {}
       };
     }
 
@@ -862,6 +1052,10 @@
 
       renderizarTransparencia();
       renderizarPoblaciones();
+      renderizarBotonesHistorico();
+      if (!document.getElementById("vista-historico").classList.contains("hidden") && historicoAnioActual) {
+        seleccionarAnioHistorico(historicoAnioActual);
+      }
       lucide.createIcons();
     }
 
@@ -1030,9 +1224,11 @@
         .filter(b => Number(b.Basauri) === 1)
         .map(b => Number(b.Putxera));
 
-      const esBasauri = (c) =>
-        String(c.Basauri || "").trim().toUpperCase() === "BASAURI" ||
-        ganadoresBasauri.includes(Number(c.Putxera));
+      const esBasauri = (c) => {
+        const val = String(c.Basauri || "").trim().toUpperCase();
+        const marcadoEnFila = ["BASAURI", "1", "SI", "SÍ", "X", "LOCAL", "PREMIO LOCAL"].includes(val);
+        return marcadoEnFila || ganadoresBasauri.includes(Number(c.Putxera));
+      };
 
       const validos = (clasifs || []).filter(c => c.Putxera && Number(c.Putxera) > 0);
       const elegibles = validos.filter(c => !esBasauri(c));
@@ -1062,8 +1258,84 @@
         puestoTercerPremio,
         p1,
         p2,
-        p3
+        p3,
+        localEnTabla: validos.find(c => esBasauri(c)) || null
       };
+    }
+
+    function construirFilaYCardClasificacion(c, premios) {
+      const nombre = String(c.Nombre || "");
+      const poblacion = String(c.Poblacion || "");
+      const tienePremioBasauri = premios.esBasauri(c);
+
+      let badgePremioDesktop = "";
+      let badgePremioMobile = "";
+      let puestoStyle = "bg-stone-100 text-stone-900";
+
+      if (tienePremioBasauri) {
+        badgePremioDesktop = `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300 whitespace-nowrap">PREMIO BASAURI</span>`;
+        badgePremioMobile = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300 whitespace-nowrap">PREMIO BASAURI</span>`;
+        puestoStyle = "bg-emerald-100 text-emerald-900 border border-emerald-300";
+      } else if (Number(c.General) === premios.puestoPrimerPremio) {
+        badgePremioDesktop = `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300 whitespace-nowrap">1º PREMIO</span>`;
+        badgePremioMobile = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300 whitespace-nowrap">1º PREMIO</span>`;
+        puestoStyle = "bg-amber-400 text-stone-900 shadow-sm";
+      } else if (Number(c.General) === premios.puestoSegundoPremio) {
+        badgePremioDesktop = `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-200 text-slate-700 whitespace-nowrap">2º PREMIO</span>`;
+        badgePremioMobile = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-200 text-slate-700 whitespace-nowrap">2º PREMIO</span>`;
+        puestoStyle = "bg-slate-200 text-slate-900";
+      } else if (Number(c.General) === premios.puestoTercerPremio) {
+        badgePremioDesktop = `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-orange-100 text-orange-800 whitespace-nowrap">3º PREMIO</span>`;
+        badgePremioMobile = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-orange-100 text-orange-800 whitespace-nowrap">3º PREMIO</span>`;
+        puestoStyle = "bg-orange-200 text-orange-950";
+      }
+
+      const tr = document.createElement("tr");
+      tr.className = "hover:bg-amber-50/40 transition";
+      tr.innerHTML = `
+        <td class="py-3 px-6 text-center font-display font-extrabold text-stone-900">${c.General}º</td>
+        <td class="py-3 px-4 text-center font-mono font-bold text-amber-800">${c.Putxera}</td>
+        <td class="py-3 px-6">
+          <span class="font-bold text-stone-900">${escapeHtml(nombre)}</span>
+          ${badgePremioDesktop}
+        </td>
+        <td class="py-3 px-4 text-stone-600 text-xs">${escapeHtml(poblacion)}</td>
+        <td class="py-3 px-3 text-center text-stone-600 text-xs font-semibold">${c.Sabor || 0}</td>
+        <td class="py-3 px-3 text-center text-stone-600 text-xs font-semibold">${c.Punto || 0}</td>
+        <td class="py-3 px-3 text-center text-stone-600 text-xs font-semibold">${c.Presencia || 0}</td>
+        <td class="py-3 px-6 text-right font-display font-black text-stone-900 text-base">${c.Total || 0} <span class="text-[10px] font-semibold text-stone-400">pts</span></td>
+      `;
+
+      const card = document.createElement("div");
+      card.className = "p-4 flex items-center justify-between gap-3 hover:bg-amber-50/40 transition";
+      card.innerHTML = `
+        <div class="flex items-start gap-3 min-w-0 flex-1">
+          <div class="w-9 h-9 rounded-xl ${puestoStyle} font-display font-extrabold text-sm flex items-center justify-center shrink-0 mt-0.5">
+            ${c.General}º
+          </div>
+          <div class="min-w-0 flex-1 space-y-0.5">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="font-mono font-bold text-xs text-amber-800">Putxera ${c.Putxera}</span>
+              ${badgePremioMobile}
+            </div>
+            <div class="font-bold text-stone-900 text-sm break-words">${escapeHtml(nombre)}</div>
+            <div class="text-xs text-stone-500">${escapeHtml(poblacion)}</div>
+            <div class="flex items-center gap-2 pt-1 text-[11px] text-stone-500 flex-wrap">
+              <span>Sabor: <strong class="text-stone-700">${c.Sabor || 0}</strong></span>
+              <span class="text-stone-300">·</span>
+              <span>Punto: <strong class="text-stone-700">${c.Punto || 0}</strong></span>
+              <span class="text-stone-300">·</span>
+              <span>Pres: <strong class="text-stone-700">${c.Presencia || 0}</strong></span>
+            </div>
+          </div>
+        </div>
+        <div class="text-right shrink-0 pl-2">
+          <div class="text-xl font-display font-black text-stone-900 leading-none">${c.Total || 0}</div>
+          <div class="text-[10px] font-semibold text-stone-400 uppercase mt-0.5">pts</div>
+        </div>
+      `;
+
+      return { tr, card };
     }
 
     function renderizarClasificacion() {
@@ -1115,88 +1387,12 @@
       lista.forEach(c => {
         if (!c.Putxera || Number(c.Putxera) <= 0) return;
 
-        const puesto = String(c.General || "");
-        const num = String(c.Putxera || "");
-        const nombre = String(c.Nombre || "");
-        const poblacion = String(c.Poblacion || "");
-
-        const texto = `${puesto} ${num} ${nombre} ${poblacion}`.toLowerCase();
+        const texto = `${c.General || ""} ${c.Putxera || ""} ${c.Nombre || ""} ${c.Poblacion || ""}`.toLowerCase();
         if (q && !texto.includes(q)) return;
 
         visibles++;
-
-        const tienePremioBasauri = premios.esBasauri(c);
-
-        let badgePremioDesktop = "";
-        let badgePremioMobile = "";
-        let puestoStyle = "bg-stone-100 text-stone-900";
-
-        if (tienePremioBasauri) {
-          // Si tiene premio Basauri, renuncia al 1º, 2º o 3º y mantiene su puesto
-          badgePremioDesktop = `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300 whitespace-nowrap">PREMIO BASAURI</span>`;
-          badgePremioMobile = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300 whitespace-nowrap">PREMIO BASAURI</span>`;
-          puestoStyle = "bg-emerald-100 text-emerald-900 border border-emerald-300";
-        } else if (Number(c.General) === premios.puestoPrimerPremio) {
-          badgePremioDesktop = `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300 whitespace-nowrap">1º PREMIO</span>`;
-          badgePremioMobile = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300 whitespace-nowrap">1º PREMIO</span>`;
-          puestoStyle = "bg-amber-400 text-stone-900 shadow-sm";
-        } else if (Number(c.General) === premios.puestoSegundoPremio) {
-          badgePremioDesktop = `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-200 text-slate-700 whitespace-nowrap">2º PREMIO</span>`;
-          badgePremioMobile = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-200 text-slate-700 whitespace-nowrap">2º PREMIO</span>`;
-          puestoStyle = "bg-slate-200 text-slate-900";
-        } else if (Number(c.General) === premios.puestoTercerPremio) {
-          badgePremioDesktop = `<span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-orange-100 text-orange-800 whitespace-nowrap">3º PREMIO</span>`;
-          badgePremioMobile = `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-orange-100 text-orange-800 whitespace-nowrap">3º PREMIO</span>`;
-          puestoStyle = "bg-orange-200 text-orange-950";
-        }
-
-        // Fila escritorio
-        const tr = document.createElement("tr");
-        tr.className = "hover:bg-amber-50/40 transition";
-        tr.innerHTML = `
-          <td class="py-3 px-6 text-center font-display font-extrabold text-stone-900">${c.General}º</td>
-          <td class="py-3 px-4 text-center font-mono font-bold text-amber-800">${c.Putxera}</td>
-          <td class="py-3 px-6">
-            <span class="font-bold text-stone-900">${escapeHtml(nombre)}</span>
-            ${badgePremioDesktop}
-          </td>
-          <td class="py-3 px-4 text-stone-600 text-xs">${escapeHtml(poblacion)}</td>
-          <td class="py-3 px-3 text-center text-stone-600 text-xs font-semibold">${c.Sabor || 0}</td>
-          <td class="py-3 px-3 text-center text-stone-600 text-xs font-semibold">${c.Punto || 0}</td>
-          <td class="py-3 px-3 text-center text-stone-600 text-xs font-semibold">${c.Presencia || 0}</td>
-          <td class="py-3 px-6 text-right font-display font-black text-stone-900 text-base">${c.Total || 0} <span class="text-[10px] font-semibold text-stone-400">pts</span></td>
-        `;
+        const { tr, card } = construirFilaYCardClasificacion(c, premios);
         tbody.appendChild(tr);
-
-        // Tarjeta móvil (4 líneas claras)
-        const card = document.createElement("div");
-        card.className = "p-4 flex items-center justify-between gap-3 hover:bg-amber-50/40 transition";
-        card.innerHTML = `
-          <div class="flex items-start gap-3 min-w-0 flex-1">
-            <div class="w-9 h-9 rounded-xl ${puestoStyle} font-display font-extrabold text-sm flex items-center justify-center shrink-0 mt-0.5">
-              ${c.General}º
-            </div>
-            <div class="min-w-0 flex-1 space-y-0.5">
-              <div class="flex items-center gap-2 flex-wrap">
-                <span class="font-mono font-bold text-xs text-amber-800">Putxera ${c.Putxera}</span>
-                ${badgePremioMobile}
-              </div>
-              <div class="font-bold text-stone-900 text-sm break-words">${escapeHtml(nombre)}</div>
-              <div class="text-xs text-stone-500">${escapeHtml(poblacion)}</div>
-              <div class="flex items-center gap-2 pt-1 text-[11px] text-stone-500 flex-wrap">
-                <span>Sabor: <strong class="text-stone-700">${c.Sabor || 0}</strong></span>
-                <span class="text-stone-300">·</span>
-                <span>Punto: <strong class="text-stone-700">${c.Punto || 0}</strong></span>
-                <span class="text-stone-300">·</span>
-                <span>Pres: <strong class="text-stone-700">${c.Presencia || 0}</strong></span>
-              </div>
-            </div>
-          </div>
-          <div class="text-right shrink-0 pl-2">
-            <div class="text-xl font-display font-black text-stone-900 leading-none">${c.Total || 0}</div>
-            <div class="text-[10px] font-semibold text-stone-400 uppercase mt-0.5">pts</div>
-          </div>
-        `;
         cardsMobile.appendChild(card);
       });
 
@@ -1299,10 +1495,195 @@
       });
     }
 
+    // ================= HISTÓRICO DE EDICIONES =================
+    function obtenerAniosHistorico() {
+      const añosSet = new Set(ANIOS_HISTORICO_DEFAULT);
+      if (appData && appData.Historico) {
+        Object.keys(appData.Historico).forEach(y => {
+          if (/^\d{4}$/.test(y)) añosSet.add(y);
+        });
+      }
+      return Array.from(añosSet).sort((a, b) => Number(b) - Number(a));
+    }
+
+    function renderizarBotonesHistorico() {
+      const container = document.getElementById("historico-year-buttons");
+      if (!container) return;
+      const años = obtenerAniosHistorico();
+      if (!historicoAnioActual || !años.includes(historicoAnioActual)) {
+        historicoAnioActual = años[0];
+      }
+
+      container.innerHTML = "";
+      años.forEach(anio => {
+        const activo = anio === historicoAnioActual;
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.onclick = () => seleccionarAnioHistorico(anio);
+        btn.className = activo
+          ? "px-4 py-2 rounded-xl font-display font-extrabold text-sm bg-amber-600 text-white shadow-md shadow-amber-600/20 transition"
+          : "px-4 py-2 rounded-xl font-display font-bold text-sm bg-stone-100 text-stone-700 hover:bg-stone-200 transition";
+        btn.textContent = `Edición ${anio}`;
+        container.appendChild(btn);
+      });
+    }
+
+    async function cargarHojaGviz(nombreHoja) {
+      if (historicoCacheGviz[nombreHoja]) return historicoCacheGviz[nombreHoja];
+      const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(nombreHoja)}`;
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error("No se pudo leer la hoja " + nombreHoja);
+      const text = await resp.text();
+      const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);?/);
+      if (!match) throw new Error("Formato inesperado al leer " + nombreHoja);
+      const json = JSON.parse(match[1]);
+      if (!json.table || !json.table.rows) return [];
+
+      const cols = (json.table.cols || []).map(c =>
+        String(c.label || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim()
+      );
+
+      const findCol = (keywords, fallbackIdx) => {
+        for (let i = 0; i < cols.length; i++) {
+          for (let k = 0; k < keywords.length; k++) {
+            if (cols[i].includes(keywords[k])) return i;
+          }
+        }
+        return fallbackIdx;
+      };
+
+      const idxPutxera = findCol(["putxera", "num", "nº"], 0);
+      const idxNombre = findCol(["nombre", "cuadrilla"], 1);
+      const idxPoblacion = findCol(["poblacion", "localidad", "pueblo"], 2);
+      const idxTotal = findCol(["total", "puntos"], 3);
+      const idxPresencia = findCol(["presencia"], 4);
+      const idxPunto = findCol(["punto"], 5);
+      const idxSabor = findCol(["sabor"], 6);
+      const idxBasauri = findCol(["basauri", "local"], 7);
+      const idxGeneral = findCol(["general", "puesto", "pos"], 8);
+
+      const val = (row, idx) => (row.c && row.c[idx] && row.c[idx].v !== null && row.c[idx].v !== undefined) ? row.c[idx].v : "";
+
+      const lista = [];
+      json.table.rows.forEach(row => {
+        const putxera = Number(val(row, idxPutxera)) || 0;
+        const nombre = String(val(row, idxNombre) || "").trim();
+        if (putxera <= 0 && !nombre) return;
+        lista.push({
+          Putxera: putxera,
+          Nombre: nombre,
+          Poblacion: String(val(row, idxPoblacion) || "").trim(),
+          Total: Number(val(row, idxTotal)) || 0,
+          Presencia: Number(val(row, idxPresencia)) || 0,
+          Punto: Number(val(row, idxPunto)) || 0,
+          Sabor: Number(val(row, idxSabor)) || 0,
+          Basauri: idxBasauri < (row.c ? row.c.length : 0) ? String(val(row, idxBasauri) || "").trim() : "",
+          General: Number(val(row, idxGeneral)) || 0
+        });
+      });
+
+      historicoCacheGviz[nombreHoja] = lista;
+      return lista;
+    }
+
+    async function seleccionarAnioHistorico(anio) {
+      historicoAnioActual = anio;
+      renderizarBotonesHistorico();
+      document.getElementById("search-historico").value = "";
+
+      const loadingEl = document.getElementById("historico-loading");
+      const emptyEl = document.getElementById("historico-empty");
+      const contenidoEl = document.getElementById("historico-contenido");
+
+      emptyEl.classList.add("hidden");
+      contenidoEl.classList.add("hidden");
+
+      let lista = (appData && appData.Historico && Array.isArray(appData.Historico[anio]))
+        ? appData.Historico[anio]
+        : null;
+
+      if (!lista) {
+        loadingEl.classList.remove("hidden");
+        try {
+          lista = await cargarHojaGviz("P" + anio);
+          if (!appData) appData = { Historico: {} };
+          if (!appData.Historico) appData.Historico = {};
+          appData.Historico[anio] = lista;
+        } catch (err) {
+          console.warn("No se pudo cargar P" + anio + " via GViz:", err);
+          lista = [];
+        } finally {
+          loadingEl.classList.add("hidden");
+        }
+      }
+
+      if (!lista || lista.length === 0) {
+        emptyEl.classList.remove("hidden");
+        return;
+      }
+
+      // Ordenar por puesto General ascendente si está disponible
+      lista.sort((a, b) => (Number(a.General) || 999) - (Number(b.General) || 999));
+
+      const premios = obtenerMapaPremios(lista, []);
+      document.getElementById("hist-badge-anio").textContent = `Edición ${anio}`;
+      document.getElementById("hist-tabla-titulo").textContent = `Clasificación General · ${anio}`;
+
+      asignarDatosPodio("hp1", premios.p1);
+      asignarDatosPodio("hp2", premios.p2);
+      asignarDatosPodio("hp3", premios.p3);
+
+      // Premio Local Basauri (si hubo ese año; en P2023 no hubo, así que se oculta)
+      const bloqueLocal = document.getElementById("hist-local-basauri");
+      if (premios.localEnTabla) {
+        const lw = premios.localEnTabla;
+        document.getElementById("hist-local-nombre").textContent = lw.Nombre || "---";
+        document.getElementById("hist-local-num").textContent = lw.Putxera ? `Putxera Nº ${lw.Putxera} (${lw.Poblacion || "Basauri"})` : "---";
+        document.getElementById("hist-local-total").textContent = lw.Total || "0";
+        document.getElementById("hist-local-sabor").textContent = lw.Sabor || "0";
+        document.getElementById("hist-local-punto").textContent = lw.Punto || "0";
+        document.getElementById("hist-local-presencia").textContent = lw.Presencia || "0";
+        bloqueLocal.classList.remove("hidden");
+      } else {
+        bloqueLocal.classList.add("hidden");
+      }
+
+      contenidoEl.classList.remove("hidden");
+      filtrarHistorico();
+      lucide.createIcons();
+    }
+
+    function filtrarHistorico() {
+      const q = (document.getElementById("search-historico").value || "").toLowerCase().trim();
+      const tbody = document.getElementById("tbody-historico");
+      const cardsMobile = document.getElementById("cards-historico-mobile");
+      tbody.innerHTML = "";
+      cardsMobile.innerHTML = "";
+
+      const lista = (appData && appData.Historico && appData.Historico[historicoAnioActual]) || [];
+      const premios = obtenerMapaPremios(lista, []);
+      let visibles = 0;
+
+      lista.forEach(c => {
+        if (!c.Putxera || Number(c.Putxera) <= 0) return;
+
+        const texto = `${c.General || ""} ${c.Putxera || ""} ${c.Nombre || ""} ${c.Poblacion || ""}`.toLowerCase();
+        if (q && !texto.includes(q)) return;
+
+        visibles++;
+        const { tr, card } = construirFilaYCardClasificacion(c, premios);
+        tbody.appendChild(tr);
+        cardsMobile.appendChild(card);
+      });
+
+      document.getElementById("sin-resultados-historico").classList.toggle("hidden", visibles > 0);
+    }
+
     function cambiarVista(vista) {
       document.getElementById("vista-principal").classList.add("hidden");
       document.getElementById("vista-transparencia").classList.add("hidden");
       document.getElementById("vista-poblaciones").classList.add("hidden");
+      document.getElementById("vista-historico").classList.add("hidden");
 
       document.querySelectorAll(".tab-btn").forEach(btn => {
         btn.classList.remove("text-amber-700", "border-b-2", "border-amber-600", "font-bold");
@@ -1316,6 +1697,12 @@
       }
 
       document.getElementById(`vista-${vista}`).classList.remove("hidden");
+
+      if (vista === "historico") {
+        const años = obtenerAniosHistorico();
+        seleccionarAnioHistorico(historicoAnioActual || años[0]);
+      }
+
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
